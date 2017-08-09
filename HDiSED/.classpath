@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
-  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
-  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
-  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
-  <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/2.10.3/ehcache-2.10.3.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar"/>
+	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry excluding="**/*.java" kind="src" output="target/test-classes" path="src/test/resources"/>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry excluding="**/*.java" kind="src" path="src/main/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/2.10.3/ehcache-2.10.3.jar" sourcepath="SOURCE_ATTACHER/ehcache-2.10.3-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar" sourcepath="SOURCE_ATTACHER/slf4j-api-1.7.7-sources.jar"/>
+	<classpathentry kind="lib" path="D:/Users/woleszko/.m2/repository/org/apache/camel/camel-core/2.19.1/camel-core-2.19.1.jar" sourcepath="D:/Users/woleszko/AppData/Local/Temp/.org.sf.feeling.decompiler1501655167751/source/camel-core-2.19.1-sources.jar"/>
+	<classpathentry kind="lib" path="D:/Users/woleszko/.m2/repository/org/apache/camel/camel-csv/2.19.1/camel-csv-2.19.1.jar"/>
+	<classpathentry kind="lib" path="D:/Users/woleszko/.m2/repository/org/apache/camel/camel-bindy/2.19.1/camel-bindy-2.19.1.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
