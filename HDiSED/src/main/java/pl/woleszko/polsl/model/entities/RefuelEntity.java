@@ -14,7 +14,7 @@ public class RefuelEntity implements Entity {
 	private Long tankId;
 	
 	@DataField(pos = 3)
-	private Long fuelVol;
+	private String fuelVol;
 	
 	// Getters and Setters
 	
@@ -34,24 +34,26 @@ public class RefuelEntity implements Entity {
 		this.tankId = tankId;
 	}
 
-	public Long getFuelVol() {
-		return fuelVol;
+	public Double getFuelVol() {
+		
+		return Double.parseDouble(fuelVol.replace(',', '.'));
 	}
 
-	public void setFuelVol(Long fuelVol) {
+	public void setFuelVol(String fuelVol) {
 		this.fuelVol = fuelVol;
 	}
 
-	public Integer getSpeed() {
-		return speed;
+	public Double getSpeed() {
+		
+		return Double.parseDouble(speed.replace(',', '.'));
 	}
 
-	public void setSpeed(Integer speed) {
+	public void setSpeed(String speed) {
 		this.speed = speed;
 	}
 
 	@DataField(pos = 4)
-	private Integer speed;
+	private String speed;
 	
 	
 }

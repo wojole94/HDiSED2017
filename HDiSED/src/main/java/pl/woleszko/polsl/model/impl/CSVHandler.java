@@ -2,6 +2,7 @@ package pl.woleszko.polsl.model.impl;
 
 import java.util.ArrayList;
 
+import org.apache.camel.main.Main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +18,14 @@ public class CSVHandler {
 		log.debug("||------------------------||");
 		log.debug("||--List Initialization---||");
 		log.debug("||------------------------||");
-
-		String output = new String();
+		this.list = body;
 		
-		for (Entity entity : body) {
-			output += entity.toString() + "\n";
-			log.debug(entity.toString());
-		}
 
 	}
 	
 	public ArrayList<Entity> getList(){
 		if (list.equals(null)) throw new NullPointerException();
+
 		return list;
 	}
 }

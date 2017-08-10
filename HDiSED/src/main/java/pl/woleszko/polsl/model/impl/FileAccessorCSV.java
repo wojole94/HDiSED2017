@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.Main;
+import org.apache.camel.main.Main;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
@@ -26,8 +26,6 @@ import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
 public class FileAccessorCSV implements FileAccessor {
 	
 	private Main mainContext;
-
-
 	private CSVHandler csvHandler;
 	private String fileName;
 	private Logger log = LoggerFactory.getLogger(FileAccessorCSV.class);
@@ -56,6 +54,7 @@ public class FileAccessorCSV implements FileAccessor {
 		mainContext = new Main();
 		// bind MyBean into the registry
 		mainContext.bind("csvHandlerBean", csvHandler);
+		mainContext.bind("terminate", this);
 		// add routes
 		mainContext.addRouteBuilder(new RouteBuilder() {
 
@@ -71,11 +70,10 @@ public class FileAccessorCSV implements FileAccessor {
 				if (fileName.equals("tankMeasures.csv"))
 				bindy = new BindyCsvDataFormat(TankMeasuresEntity.class);
 				
-				from("file:D:/?fileName="+fileName+"&noop=true")						
+				from("file:D:/?fileName="+fileName+"&delay=1000&noop=true")						
 						.unmarshal(bindy)
-						.log("pol route'a")
-						.log("za procesem")
-						.to("bean:csvHandlerBean?method=csvHandler");
+						.to("bean:csvHandlerBean?method=csvHandler")
+						.to("bean:terminate?method=close");
 
 			}
 
@@ -86,9 +84,9 @@ public class FileAccessorCSV implements FileAccessor {
 	// run until you terminate the JVM
 	System.out.println("Starting Camel. Use ctrl + c to terminate the JVM.\n");
 	try {
-		mainContext.start();	
-		mainContext.run();
 
+		mainContext.run();
+		
 	
 	} catch (Exception e) {
 		e.printStackTrace();
@@ -98,13 +96,9 @@ public class FileAccessorCSV implements FileAccessor {
 	log.debug("||------------------------||");
 	}
 	
+
 	public void close() {
-		try {
-			mainContext.stop();
-			mainContext.shutdown();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		mainContext.completed();
 	}
 
 }

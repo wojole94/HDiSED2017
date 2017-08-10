@@ -76,8 +76,8 @@ public class NozzleMeasuresEntity implements Entity{
 	}
 
 	public Double getLiterCounter() {
-		totalCounter.replace(',', '.');
-		return Double.parseDouble(totalCounter);
+		
+		return Double.parseDouble(literCounter.replace(',', '.'));
 	}
 
 	public void setLiterCounter(String literCounter) {
@@ -85,8 +85,8 @@ public class NozzleMeasuresEntity implements Entity{
 	}
 
 	public Double getTotalCounter() {
-		totalCounter.replace(',', '.');
-		return Double.parseDouble(totalCounter);
+		
+		return Double.parseDouble(totalCounter.replace(',', '.'));
 	}
 
 	public void setTotalCounter(String totalCounter) {
