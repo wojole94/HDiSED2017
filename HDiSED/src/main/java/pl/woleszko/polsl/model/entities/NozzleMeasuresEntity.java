@@ -42,7 +42,7 @@ public class NozzleMeasuresEntity implements Entity{
 	private Boolean status;
 
 	// Getters and Setters
-	
+	@Override
 	public Date getDate() {
 		return date;
 	}

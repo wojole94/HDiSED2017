@@ -17,7 +17,7 @@ public class RefuelEntity implements Entity {
 	private String fuelVol;
 	
 	// Getters and Setters
-	
+	@Override
 	public Date getDate() {
 		return date;
 	}

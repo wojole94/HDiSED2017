@@ -7,5 +7,5 @@ import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 @CsvRecord(separator = ";")
 public interface Entity {
-
+	public Date getDate();
 }

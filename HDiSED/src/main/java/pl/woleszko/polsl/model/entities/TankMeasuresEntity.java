@@ -30,7 +30,7 @@ public class TankMeasuresEntity implements Entity{
 	
 	
 	// Getters and Setters
-
+	@Override
 	public Date getDate() {
 		return date;
 	}
