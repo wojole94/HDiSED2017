@@ -11,7 +11,7 @@ public class NozzleMeasuresEntity implements Entity{
 	
 	public NozzleMeasuresEntity() {
 		super();
-//		this.date = null;
+		this.date = null;
 		this.locId = null;
 		this.nozId = null;
 		this.tankId = null;

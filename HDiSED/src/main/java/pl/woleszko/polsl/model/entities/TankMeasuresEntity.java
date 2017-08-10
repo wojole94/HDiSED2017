@@ -20,19 +20,14 @@ public class TankMeasuresEntity implements Entity{
 	private Long tankId;
 	
 	@DataField(pos = 5)
-	private Long fuelLvl;
+	private String fuelLvl;
 	
 	@DataField(pos = 6)
-	private Long fuelVol;
+	private String fuelVol;
 	
 	@DataField(pos = 7)
 	private Integer fuelTemp;
 	
-	@DataField(pos = 8)
-	private Long waterLvl;
-	
-	@DataField(pos = 9)
-	private Long waterVol;
 	
 	// Getters and Setters
 
@@ -68,19 +63,19 @@ public class TankMeasuresEntity implements Entity{
 		this.tankId = tankId;
 	}
 
-	public Long getFuelLvl() {
-		return fuelLvl;
+	public Double getFuelLvl() {
+		return Double.parseDouble(fuelLvl.replace(',', '.'));
 	}
 
-	public void setFuelLvl(Long fuelLvl) {
+	public void setFuelLvl(String fuelLvl) {
 		this.fuelLvl = fuelLvl;
 	}
 
-	public Long getFuelVol() {
-		return fuelVol;
+	public Double getFuelVol() {
+		return Double.parseDouble(fuelVol.replace(',', '.'));
 	}
 
-	public void setFuelVol(Long fuelVol) {
+	public void setFuelVol(String fuelVol) {
 		this.fuelVol = fuelVol;
 	}
 
@@ -92,21 +87,7 @@ public class TankMeasuresEntity implements Entity{
 		this.fuelTemp = fuelTemp;
 	}
 
-	public Long getWaterLvl() {
-		return waterLvl;
-	}
 
-	public void setWaterLvl(Long waterLvl) {
-		this.waterLvl = waterLvl;
-	}
-
-	public Long getWaterVol() {
-		return waterVol;
-	}
-
-	public void setWaterVol(Long waterVol) {
-		this.waterVol = waterVol;
-	}
 	
 	
 }

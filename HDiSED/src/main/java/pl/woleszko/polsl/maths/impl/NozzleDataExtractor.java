@@ -9,25 +9,23 @@ import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
 import pl.woleszko.polsl.model.impl.FileAccessor;
 import pl.woleszko.polsl.model.impl.FileAccessorCSV;
 
-public class NozzleDataExtractor implements DataExtractor {
+public class NozzleDataExtractor extends DataExtractor {
 	ArrayList<NozzleMeasuresEntity> entities = new ArrayList<NozzleMeasuresEntity>();
 
 	
 	public NozzleDataExtractor(){
-		FileAccessorCSV access = new FileAccessorCSV("nozzleMeasures.csv");
-		ArrayList<Entity> list = (ArrayList<Entity>) access.getValues();
+		ArrayList<Entity> list = getEntities("nozzleMeasures.csv");
 		for(Entity ent : list) {
 			entities.add((NozzleMeasuresEntity) ent);
 		}
-		//access.close();
 	}
 		
 	
-	public HashMap<Long,Double> getTotals() {
+	public HashMap<Long,Double> getWeeklyTotals() {
 		
 		Double tempSum = (double) 0;
 		Date date = entities.get(entities.size()-1).getDate();
-		ArrayList<NozzleMeasuresEntity> extracted = new ArrayList<NozzleMeasuresEntity>();
+
 		HashMap<Long,Double> totals = new HashMap<Long,Double>();
 		
 		for(NozzleMeasuresEntity entity : entities) {
@@ -36,14 +34,10 @@ public class NozzleDataExtractor implements DataExtractor {
 		}
 		for(NozzleMeasuresEntity entity : entities) {
 			if (entity.getDate().getTime() == date.getTime()) {
-				extracted.add(entity);
+				tempSum = totals.get(entity.getTankId());
+				tempSum += entity.getTotalCounter();
+				totals.put(entity.getTankId(), tempSum);
 			}
-		}
-		for(NozzleMeasuresEntity entity : extracted) {
-			//TODO sum totals for each tank
-			tempSum = totals.get(entity.getTankId());
-			tempSum += entity.getTotalCounter();
-			totals.put(entity.getTankId(), tempSum);			
 		}	
 		
 		return totals;
