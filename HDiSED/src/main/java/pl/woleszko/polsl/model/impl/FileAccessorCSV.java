@@ -28,7 +28,7 @@ public class FileAccessorCSV implements FileAccessor {
 	private Main mainContext;
 	private CSVHandler csvHandler;
 	private String fileName;
-	private Logger log = LoggerFactory.getLogger(FileAccessorCSV.class);
+	//private Logger log = LoggerFactory.getLogger(FileAccessorCSV.class);
 	
 	public FileAccessorCSV(String fileName){
 		csvHandler = new CSVHandler();
@@ -46,9 +46,9 @@ public class FileAccessorCSV implements FileAccessor {
 	@Override
 	public void configure() {
 		
-		log.debug("||--------------------||");
-		log.debug("||---Configuring...---||");
-		log.debug("||--------------------||");
+		//log.debug("||--------------------||");
+	//	log.debug("||---Configuring...---||");
+	//	log.debug("||--------------------||");
 		
 		// create a Main instance
 		mainContext = new Main();
@@ -70,7 +70,7 @@ public class FileAccessorCSV implements FileAccessor {
 				if (fileName.equals("tankMeasures.csv"))
 				bindy = new BindyCsvDataFormat(TankMeasuresEntity.class);
 				
-				from("file:D:/?fileName="+fileName+"&delay=1000&noop=true")						
+				from("file:D:/Zestaw 1/?fileName="+fileName+"&delay=1000&noop=true")						
 						.unmarshal(bindy)
 						.to("bean:csvHandlerBean?method=csvHandler")
 						.to("bean:terminate?method=close");
@@ -91,9 +91,9 @@ public class FileAccessorCSV implements FileAccessor {
 	} catch (Exception e) {
 		e.printStackTrace();
 	}
-	log.debug("||------------------------||");
-	log.debug("||---Context started...---||");
-	log.debug("||------------------------||");
+//	log.debug("||------------------------||");
+//	log.debug("||---Context started...---||");
+//	log.debug("||------------------------||");
 	}
 	
 

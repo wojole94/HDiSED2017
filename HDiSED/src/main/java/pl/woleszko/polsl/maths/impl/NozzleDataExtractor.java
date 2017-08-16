@@ -29,10 +29,10 @@ public class NozzleDataExtractor extends DataExtractor {
 
 		HashMap<Long, Double> totals = new HashMap<Long, Double>();
 
-		HashMap<Integer, Times> times = splitDates(period);
-		Set<Integer> keys = times.keySet();
+		HashMap<Long, Times> times = splitDates(period);
+		Set<Long> keys = times.keySet();
 
-		for (Integer key : keys) {
+		for (Long key : keys) {
 			for (NozzleMeasuresEntity entity : entities) {
 				if (!totals.containsKey(entity.getTankId()))
 					totals.put(entity.getTankId(), (double) 0);
