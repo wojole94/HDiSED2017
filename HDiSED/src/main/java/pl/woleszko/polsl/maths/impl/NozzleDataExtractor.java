@@ -22,27 +22,42 @@ public class NozzleDataExtractor extends DataExtractor {
 		}
 	}
 
-	public HashMap<Long, Double> getVolumeTotals(Period period) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
 
-		Double tempSum = (double) 0;
+		
+		Double curr = new Double(0);
+		Double endVol = new Double(0);
+		Double startVol = new Double(0);
+		
+		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
+		HashMap<Long, Times> times = this.splitDates(period);
+		Set<Long> periodKeys = times.keySet();
 
-		HashMap<Long, Double> totals = new HashMap<Long, Double>();
-
-		HashMap<Long, Times> times = splitDates(period);
-		Set<Long> keys = times.keySet();
-
-		for (Long key : keys) {
+		for (Long key : periodKeys) {
+			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (NozzleMeasuresEntity entity : entities) {
-				if (!totals.containsKey(entity.getTankId()))
-					totals.put(entity.getTankId(), (double) 0);
+
+				if (!tanksVolume.containsKey(entity.getTankId()))
+					tanksVolume.put(entity.getTankId(), (double) 0);
+				
+				//Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika wylicza delte 
 				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
-					tempSum = totals.get(entity.getTankId());
-					tempSum += entity.getTotalCounter();
-					totals.put(entity.getTankId(), tempSum);
+					curr = tanksVolume.get(entity.getTankId());
+					endVol = entity.getTotalCounter();						
+					curr = endVol + curr;
+					tanksVolume.put(entity.getTankId(), curr);				
 				}
+					
+				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) { 
+					curr = tanksVolume.get(entity.getTankId());
+					startVol = entity.getTotalCounter();						
+					curr = curr - startVol;
+					tanksVolume.put(entity.getTankId(), curr);
+				}
+				}
+			totals.put(times.get(key), tanksVolume);
 			}
-		}
 		return totals;
 	}
 }

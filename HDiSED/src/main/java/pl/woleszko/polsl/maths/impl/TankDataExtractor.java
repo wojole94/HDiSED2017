@@ -3,6 +3,7 @@ package pl.woleszko.polsl.maths.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -23,30 +24,93 @@ public class TankDataExtractor extends DataExtractor {
 		}
 	}
 
-	public HashMap<Long, Double> getVolumeTotals(Period period) {
-		HashMap<Long, Double> totals = new HashMap<Long, Double>();
-		HashMap<Long, Times> times = splitDates(period);
-		Set<Long> keys = times.keySet();
-		
-		for (Long key : keys) {
+	// Returns Hashmap<Periods, Hashmap<TankID, VolTot>>
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
+		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
+		HashMap<Long, Times> times = this.splitDates(period);
+		Set<Long> periodKeys = times.keySet();
+		Double startVol;
+		Double endVol;
+		Double curr = new Double(0);
+
+		for (Long key : periodKeys) {
+			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (TankMeasuresEntity entity : entities) {
-				if (!totals.containsKey(entity.getTankId()))
-					totals.put(entity.getTankId(), (double) 0);
+				// Jezeli nie ma tanka to dodaj
+				if (!tanksVolume.containsKey(entity.getTankId()))
+					tanksVolume.put(entity.getTankId(), (double) 0);
+
+				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
+				// wylicza delte
 				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
-					Double tempSum = totals.get(entity.getTankId());
-					tempSum -= entity.getFuelVol();
-					totals.put(entity.getTankId(), tempSum);
-				}
-				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) {
-					Double tempSum = totals.get(entity.getTankId());
-					tempSum += entity.getFuelVol();
-					totals.put(entity.getTankId(), tempSum);
+					curr = tanksVolume.get(entity.getTankId());
+					endVol = entity.getFuelVol();
+					curr = curr - endVol;
+					tanksVolume.put(entity.getTankId(), curr);
 				}
 
+				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) {
+					curr = tanksVolume.get(entity.getTankId());
+					startVol = entity.getFuelVol();
+					curr = curr + startVol ;
+					tanksVolume.put(entity.getTankId(), curr);
+				}
 			}
+			totals.put(times.get(key), tanksVolume);
+
 		}
 
 		return totals;
-
 	}
+
+	public Integer getTanksCount() {
+		HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
+		Integer count = new Integer(0);
+
+		for (TankMeasuresEntity entity : entities) {
+			if (!tanksVolume.containsKey(entity.getTankId())) {
+				tanksVolume.put(entity.getTankId(), (double) 0);
+				count++;
+			}
+		}
+		return count;
+	}
+
+	public Set<Long> getTanksIndexes() {
+		Set<Long> keys = new HashSet<Long>();
+
+		for (TankMeasuresEntity entity : entities) {
+			if (!keys.contains(entity.getTankId())) {
+				keys.add(entity.getTankId());
+			}
+		}
+
+		return keys;
+	}
+
+	// public ArrayList<Double> getPeriodDelta(Period period){
+	//
+	// ArrayList<Double> results = new ArrayList<Double>();
+	// HashMap<Long, Times> periods = this.splitDates(Period.HOUR);
+	// Double startVol;
+	// Double endVol;
+	// Double delta;
+	//
+	//
+	// for(Long periodKey : periods.keySet()) {
+	// for(TankMeasuresEntity entity : entities) {
+	// if(entity.getDate().equals(periods.get(periodKey).getFrom())) startVol =
+	// entity.getFuelVol();
+	// if(entity.getDate().equals(periods.get(periodKey).getTo())) endVol =
+	// entity.getFuelVol();
+	// }
+	// delta = new Double(endVol - startVol);
+	// results.add(delta)
+	// }
+	// }
+	//
+	//
+	//
+	// return results;
+	// }
 }

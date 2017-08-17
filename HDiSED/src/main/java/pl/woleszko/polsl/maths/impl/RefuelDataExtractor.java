@@ -23,27 +23,31 @@ public class RefuelDataExtractor extends DataExtractor {
 	}
 
 	@Override
-	public HashMap<Long, Double> getVolumeTotals(Period period) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
 
-		Date date = entities.get(entities.size() - 1).getDate();
+//		Date date = entities.get(entities.size() - 1).getDate();
 
-		HashMap<Long, Double> totals = new HashMap<Long, Double>();
+		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
 		HashMap<Long, Times> times = splitDates(period);
-		Set<Long> keys = times.keySet();
+		Set<Long> periodKeys = times.keySet();
 
-		for (Long key : keys) {
+		for (Long key : periodKeys) {
+			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (RefuelEntity entity : entities) {
-				if (!totals.containsKey(entity.getTankId()))
-					totals.put(entity.getTankId(), (double) 0);
-				if (entity.getDate().getTime() <= times.get(key).getTo().getTime() && 
-						entity.getDate().getTime() >= times.get(key).getFrom().getTime()) {
-					Double tempSum = totals.get(entity.getTankId());
-					tempSum += entity.getFuelVol();
-					totals.put(entity.getTankId(), tempSum);
+				
+				if (!tanksVolume.containsKey(entity.getTankId()))
+					tanksVolume.put(entity.getTankId(), (double) 0);
+				
+				//Szuka czasu zawartego w okresie, jezeli tak to dla konkretnego zbiornika wylicza sume wplywow 
+				if (times.get(key).dateInPeriod(entity.getDate())) {
+					Double curr = tanksVolume.get(entity.getTankId());
+					Double totalVol = entity.getFuelVol();						
+					totalVol = totalVol + curr;
+					tanksVolume.put(entity.getTankId(), totalVol);
 				}
-
 			}
+			totals.put(times.get(key), tanksVolume);
 		}
 		return totals;
 

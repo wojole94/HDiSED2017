@@ -26,7 +26,7 @@ public abstract class DataExtractor {
 
 		switch (swPeriod) {
 		case FULL_TIME: {
-			Date lastDate = list.get(list.size() - 1).getDate();
+			Date lastDate = list.get(list.size()-1).getDate();
 			Date firstDate = list.get(0).getDate();
 			Long key = new Long(0);
 			for (Entity entity : list) {
@@ -108,6 +108,6 @@ public abstract class DataExtractor {
 		return null;
 	}
 
-	public abstract HashMap<Long, Double> getVolumeTotals(Period period);
+	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period);
 
 }
