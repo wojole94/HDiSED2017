@@ -52,7 +52,7 @@ public class TankDataExtractor extends DataExtractor {
 				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) {
 					curr = tanksVolume.get(entity.getTankId());
 					startVol = entity.getFuelVol();
-					curr = curr + startVol ;
+					curr = curr + startVol;
 					tanksVolume.put(entity.getTankId(), curr);
 				}
 			}
@@ -62,7 +62,62 @@ public class TankDataExtractor extends DataExtractor {
 
 		return totals;
 	}
-
+	//Srednie dzienne,godzinowe itp
+	public HashMap<Long, Double> getAverageDeltasOf(Period period) {
+		
+		HashMap<Long, Double> avg = new HashMap<Long, Double>();
+		for (Long tank : this.getTanksIndexes()) {
+			avg.put(tank, 0.0);
+		}
+		
+		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(period);
+		
+		for (Times timePeriod : totals.keySet()) {
+			HashMap<Long, Double> tanksTotals = totals.get(timePeriod);
+			for(Long tank : tanksTotals.keySet()) {
+				Double value = avg.get(tank);
+				value = tanksTotals.get(tank) + value;
+				avg.put(tank, value);
+			}	
+		}
+		
+		for(Long tank : avg.keySet()) {
+			
+			Double value = avg.get(tank);
+			value = value/totals.size();
+			avg.put(tank, value);
+		}
+		
+		return avg;
+	}
+	
+	public HashMap<Integer, HashMap<Long, Double>> getHoursTrend() {
+		
+		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(Period.HOUR);
+		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<Integer, HashMap<Long, Double>>();
+		
+				
+		for(Times timePeriod : totals.keySet()) {
+			
+			if(!avg.containsKey(timePeriod.getFrom().getHours())) {
+				System.out.println("New hour!");
+				avg.put(timePeriod.getFrom().getHours(), 0.0);
+				for(Times currTimePeriod : totals.keySet()) {
+					Double value = 0.0;
+					if (currTimePeriod.getFrom().getHours() == timePeriod.getFrom().getHours()) {
+						//1. Odczytanie danych totals z Hashmapy
+						//2. Dla kazdego zbiornika wyliczyc sume 
+						
+					}
+				}
+			}
+		}
+		
+		//Obliczyc srednia 
+		
+		return avg;
+	}
+	
 	public Integer getTanksCount() {
 		HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 		Integer count = new Integer(0);
@@ -88,29 +143,4 @@ public class TankDataExtractor extends DataExtractor {
 		return keys;
 	}
 
-	// public ArrayList<Double> getPeriodDelta(Period period){
-	//
-	// ArrayList<Double> results = new ArrayList<Double>();
-	// HashMap<Long, Times> periods = this.splitDates(Period.HOUR);
-	// Double startVol;
-	// Double endVol;
-	// Double delta;
-	//
-	//
-	// for(Long periodKey : periods.keySet()) {
-	// for(TankMeasuresEntity entity : entities) {
-	// if(entity.getDate().equals(periods.get(periodKey).getFrom())) startVol =
-	// entity.getFuelVol();
-	// if(entity.getDate().equals(periods.get(periodKey).getTo())) endVol =
-	// entity.getFuelVol();
-	// }
-	// delta = new Double(endVol - startVol);
-	// results.add(delta)
-	// }
-	// }
-	//
-	//
-	//
-	// return results;
-	// }
 }

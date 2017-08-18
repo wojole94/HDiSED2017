@@ -89,7 +89,7 @@ public class DataAnalizer {
 		return variances;
 	}
 
-	public double getAvgPerHour(Double variance) {
+	public double getAvgVariancePerHour(Double variance) {
 
 		double result = 0;
 		HashMap<Long, Times> list = tanks.splitDates(Period.HOUR);

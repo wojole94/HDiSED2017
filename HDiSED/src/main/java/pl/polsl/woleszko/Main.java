@@ -21,21 +21,23 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		DataAnalizer extractor = new DataAnalizer();
+		TankDataExtractor extractor = new TankDataExtractor();
 		
 //		HashMap<Long, Times> list = 
-		HashMap<Long, Double> variances = extractor.detect();
+		HashMap<Long, Double> list = extractor.getAverageDeltasOf(Period.HOUR);
+		
+		
 //		Set<Long> keys = variances.keySet();
 //		System.out.println();
 //		for(Long key : keys) {System.out.println("Avg leakage per hour = " + extractor.getAvgPerHour(variances.get(key)));}
 		
 //		HashMap<Long, Double> list = extractor.getVolumeTotals(Period.FULL_TIME);
 //		
-//		Integer counter = 0;
-//		for(Long key : list.keySet()) {
-//			counter++;
-//			System.out.println(list.get(key));
-//		}
+		Integer counter = 0;
+		for(Long key : list.keySet()) {
+			counter++;
+			System.out.println("Average for tank " + key + ": " +list.get(key));
+		}
 //		
 //		System.out.println("counter: " + counter);
 	}

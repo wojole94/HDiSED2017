@@ -46,28 +46,43 @@ public abstract class DataExtractor {
 		}
 		case DAY: {
 			HashMap<Long, Times> result = new HashMap<Long, Times>();
+			System.out.println(list.get(0).toString());
+			System.out.println("----------------------->>");
 			for(Entity entity : list) {
-				int day = (int) entity.getDate().getDate() * 31;
-				int month = (int) (entity.getDate().getMonth() + 1) * 12;
-				 
+				Integer day = entity.getDate().getDate() * 31;
+				Integer month = (entity.getDate().getMonth() + 1) * 12;	 
 				Long keyValue = (long) (day+month);
 				if(!result.containsKey(keyValue)) {
+					System.out.println("New day! " + entity.getDate().toString());
+
 					Long currDay = keyValue;
 					Date lastDate = entity.getDate();
 					Date firstDate = entity.getDate();
+					
 					for (Entity currEntity : list) {
-						int currentDay = (int) currEntity.getDate().getDate() * 31;
-						int currMonth = (int) (currEntity.getDate().getMonth() + 1) * 12;
+						Integer currentDay = currEntity.getDate().getDate() * 31;
+						Integer currMonth = (currEntity.getDate().getMonth() + 1) * 12;
 						Long checkVal = (long) (currentDay + currMonth);
-						if (checkVal == currentDay) {
-							if (currEntity.getDate().getTime() > lastDate.getTime())
-								lastDate = entity.getDate();
-							if (currEntity.getDate().getTime() < firstDate.getTime())
-								firstDate = entity.getDate();
+						if (checkVal.equals(currDay)) {
+						
+							if (currEntity.getDate().getTime() >= lastDate.getTime()) {
+								lastDate = currEntity.getDate();
+								
+							}
+							if (currEntity.getDate().getTime() < firstDate.getTime()) {
+								firstDate = currEntity.getDate();
+								System.out.println("Lesser! don know why?!");
+								System.out.println("---------------------------->>");
+							}
+								
+
 						}
 					}
 					Times dates = new Times(firstDate, lastDate);
-					result.put(currDay, dates);
+					result.put(keyValue, dates);
+					System.out.println("Period: " + firstDate.toString() + " --> " + lastDate.toString());
+					System.out.println("Absolute Period: " + firstDate.getTime() + " --> " + lastDate.getTime());
+					System.out.println("---------------------->>");
 					
 				}
 			}
@@ -77,28 +92,35 @@ public abstract class DataExtractor {
 			
 			HashMap<Long, Times> result = new HashMap<Long, Times>();
 			for (Entity entity : list) {
-				int day = (int) entity.getDate().getDate() * 31;
-				int month = (int) (entity.getDate().getMonth() + 1) * 12;
-				int hour = (int) (entity.getDate().getHours() + 1) * 24;
+				Integer day = entity.getDate().getDate() * 31;
+				Integer month = (entity.getDate().getMonth() + 1) * 12;
+				Integer hour = (entity.getDate().getHours() + 1) * 24;
 				Long keyValue = (long) (hour+day+month);
 				if (!result.containsKey(keyValue)) {
+					System.out.println("New hour! " + entity.getDate().toString());
 					Long currHour = keyValue;
 					Date lastDate = entity.getDate();
 					Date firstDate = entity.getDate();
+					
 					for (Entity currEntity : list) {
-						int currDay = (int) currEntity.getDate().getDate() * 31;
-						int currMonth = (int) (currEntity.getDate().getMonth() + 1) * 12;
-						int currentHour = (int) (currEntity.getDate().getHours() + 1) * 24;
-						Long checkVal = (long) (hour+day+month);
-						if (checkVal == currHour) {
-							if (currEntity.getDate().getTime() > lastDate.getTime())
-								lastDate = entity.getDate();
-							if (currEntity.getDate().getTime() < firstDate.getTime())
-								firstDate = entity.getDate();
+						Integer currDay = currEntity.getDate().getDate() * 31;
+						Integer currMonth = (currEntity.getDate().getMonth() + 1) * 12;
+						Integer currentHour = (currEntity.getDate().getHours() + 1) * 24;
+						Long checkVal = (long) (currentHour+currDay+currMonth);
+						if (checkVal.equals(currHour)) {
+							if (currEntity.getDate().getTime() >= lastDate.getTime()) {
+								lastDate = currEntity.getDate();
+							}
+							if (currEntity.getDate().getTime() < firstDate.getTime()) {
+								firstDate = currEntity.getDate();
+							}
 						}
 					}
 					Times dates = new Times(firstDate, lastDate);
 					result.put(currHour, dates);
+					System.out.println("Period: " + firstDate.toString() + " --> " + lastDate.toString());
+					System.out.println("Absolute Period: " + firstDate.getTime() + " --> " + lastDate.getTime());
+					System.out.println("---------------------->>");
 				}
 			}
 			return result;
