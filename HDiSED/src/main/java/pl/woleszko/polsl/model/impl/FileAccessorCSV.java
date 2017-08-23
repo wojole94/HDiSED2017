@@ -70,7 +70,7 @@ public class FileAccessorCSV implements FileAccessor {
 				if (fileName.equals("tankMeasures.csv"))
 				bindy = new BindyCsvDataFormat(TankMeasuresEntity.class);
 				
-				from("file:D:/Zestaw 1/?fileName="+fileName+"&delay=1000&noop=true")						
+				from("file:C:/Zestaw 1/?fileName="+fileName+"&delay=1000&noop=true")						
 						.unmarshal(bindy)
 						.to("bean:csvHandlerBean?method=csvHandler")
 						.to("bean:terminate?method=close");
