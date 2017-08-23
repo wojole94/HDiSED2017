@@ -5,10 +5,10 @@
 	<groupId>pl.polsl.woleszko</groupId>
 	<artifactId>HDiSED</artifactId>
 	<version>1.0</version>
-	
 
 
-<properties>
+
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- LOG level -->
@@ -29,7 +29,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.6.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

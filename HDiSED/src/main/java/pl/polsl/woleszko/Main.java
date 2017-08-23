@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import pl.woleszko.polsl.interpret.DataAnalizer;
+import pl.woleszko.polsl.maths.impl.DataExtractor;
 //import pl.woleszko.polsl.interpret.LeakageDetector;
 import pl.woleszko.polsl.maths.impl.NozzleDataExtractor;
 import pl.woleszko.polsl.maths.impl.RefuelDataExtractor;
@@ -21,25 +22,37 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		TankDataExtractor extractor = new TankDataExtractor();
-		
-//		HashMap<Long, Times> list = 
-		HashMap<Long, Double> list = extractor.getAverageDeltasOf(Period.HOUR);
-		
-		
-//		Set<Long> keys = variances.keySet();
-//		System.out.println();
-//		for(Long key : keys) {System.out.println("Avg leakage per hour = " + extractor.getAvgPerHour(variances.get(key)));}
-		
-//		HashMap<Long, Double> list = extractor.getVolumeTotals(Period.FULL_TIME);
+//		TankDataExtractor extractor = new TankDataExtractor();
 //		
-		Integer counter = 0;
-		for(Long key : list.keySet()) {
-			counter++;
-			System.out.println("Average for tank " + key + ": " +list.get(key));
-		}
+////		HashMap<Long, Times> list = 
+//		HashMap<Integer, HashMap<Long, Double>> list = extractor.getHoursTrend();
 //		
-//		System.out.println("counter: " + counter);
+//		
+////		Set<Long> keys = variances.keySet();
+////		System.out.println();
+////		for(Long key : keys) {System.out.println("Avg leakage per hour = " + extractor.getAvgPerHour(variances.get(key)));}
+//		
+////		HashMap<Long, Double> list = extractor.getVolumeTotals(Period.FULL_TIME);
+////		
+//		Integer counter = 0;
+//		for(Integer key : list.keySet()) {
+//			System.out.println("Hour: " + key);
+//			HashMap<Long, Double> tanksTotals = list.get(key);
+//			// odczyt z tankow
+//			for(Long tank : tanksTotals.keySet()) {
+//				System.out.println("Tank " + tank + "avg = " +tanksTotals.get(tank));
+//				
+//			}
+//		}
+////		
+////		System.out.println("counter: " + counter);
+		
+		DataExtractor analise = new TankDataExtractor();
+//		analise.detect();
+		analise.splitDates(Period.DAY);
+		analise.splitDates((long) 86400000);
+//		analise.checkTank((long) 3);
+
 	}
 
 

@@ -67,9 +67,9 @@ public class DataAnalizer {
 					refuelTotals.put(tank, new Double(0));
 				}
 			}
-			
-			//==========================================
-			
+
+			// ==========================================
+
 			Double variance = new Double(0);
 			for (Long tank : tanksList) {
 				variance = nozzleTotals.get(tank);
@@ -87,6 +87,42 @@ public class DataAnalizer {
 		}
 
 		return variances;
+	}
+
+	// 10%
+	public void checkTank(Long tankID) {
+		HashMap<Integer, HashMap<Long, Double>> hoursAvg = tanks.getHoursTrend();
+		HashMap<Times, HashMap<Long, Double>> hoursVol = tanks.getVolumeTotals(Period.HOUR);
+
+		Integer counter = 0;
+		HashMap<Long, Double> testers = new HashMap<Long, Double>();
+		HashMap<Long, Double> actuals = new HashMap<Long, Double>();
+
+		for (Times time : hoursVol.keySet()) {
+			for (Integer hour : hoursAvg.keySet()) {
+				if (time.getFrom().getHours() == hour) {
+					testers = hoursAvg.get(hour);
+					actuals = hoursVol.get(time);
+
+					Double standard = testers.get(tankID);
+					Double actual = actuals.get(tankID);
+					Double value = new Double(0);
+					if (!actual.equals(0D))
+						value = actual / standard; // uzyskujemy jaki procent odchyłu
+					value = Math.abs(value);
+
+					if (value > 2.60) {
+						System.out.println("Probability of leakage on tank #" + tankID + " at " + time.toString());
+						System.out.println("Delta: " + value + "%");
+						counter++;
+					}
+
+				}
+			}
+
+		}
+		System.out.println("COunter: " + counter);
+
 	}
 
 	public double getAvgVariancePerHour(Double variance) {
