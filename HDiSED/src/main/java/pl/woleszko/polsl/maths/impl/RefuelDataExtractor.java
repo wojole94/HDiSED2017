@@ -23,13 +23,13 @@ public class RefuelDataExtractor extends DataExtractor {
 	}
 
 	@Override
-	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(HashMap<Long, Times> times) {
 
 //		Date date = entities.get(entities.size() - 1).getDate();
 
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
-		HashMap<Long, Times> times = splitDates(period);
+//		HashMap<Long, Times> times = splitDates(period);
 		Set<Long> periodKeys = times.keySet();
 
 		for (Long key : periodKeys) {

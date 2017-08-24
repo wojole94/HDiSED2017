@@ -39,7 +39,7 @@ public class NozzleMeasuresEntity implements Entity{
 	private String totalCounter;
 	
 	@DataField(pos = 7)
-	private Boolean status;
+	private Integer status;
 
 	// Getters and Setters
 	@Override
@@ -94,11 +94,11 @@ public class NozzleMeasuresEntity implements Entity{
 		this.totalCounter = totalCounter;
 	}
 
-	public Boolean getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(Boolean status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 }

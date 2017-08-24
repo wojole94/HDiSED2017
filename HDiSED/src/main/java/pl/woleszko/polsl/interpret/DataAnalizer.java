@@ -16,9 +16,12 @@ public class DataAnalizer {
 	TankDataExtractor tanks = new TankDataExtractor();
 
 	public HashMap<Long, Double> detect() {
-		HashMap<Times, HashMap<Long, Double>> nozzleVolumes = nozzles.getVolumeTotals(Period.FULL_TIME);
-		HashMap<Times, HashMap<Long, Double>> refuelVolumes = refuels.getVolumeTotals(Period.FULL_TIME);
-		HashMap<Times, HashMap<Long, Double>> tankVolumes = tanks.getVolumeTotals(Period.FULL_TIME);
+		HashMap<Long, Times> nozzleTimes = nozzles.splitDates(Period.FULL_TIME);
+		HashMap<Times, HashMap<Long, Double>> nozzleVolumes = nozzles.getVolumeTotals(nozzleTimes);
+		HashMap<Long, Times> refuelTimes = refuels.splitDates(Period.FULL_TIME);		
+		HashMap<Times, HashMap<Long, Double>> refuelVolumes = refuels.getVolumeTotals(refuelTimes);
+		HashMap<Long, Times> tankTimes = nozzles.splitDates(Period.FULL_TIME);
+		HashMap<Times, HashMap<Long, Double>> tankVolumes = tanks.getVolumeTotals(tankTimes);
 
 		Set<Long> tanksList = tanks.getTanksIndexes();
 		Set<Times> periodKeys = tankVolumes.keySet();
@@ -92,36 +95,57 @@ public class DataAnalizer {
 	// 10%
 	public void checkTank(Long tankID) {
 		HashMap<Integer, HashMap<Long, Double>> hoursAvg = tanks.getHoursTrend();
-		HashMap<Times, HashMap<Long, Double>> hoursVol = tanks.getVolumeTotals(Period.HOUR);
 
-		Integer counter = 0;
-		HashMap<Long, Double> testers = new HashMap<Long, Double>();
-		HashMap<Long, Double> actuals = new HashMap<Long, Double>();
-
-		for (Times time : hoursVol.keySet()) {
-			for (Integer hour : hoursAvg.keySet()) {
-				if (time.getFrom().getHours() == hour) {
-					testers = hoursAvg.get(hour);
-					actuals = hoursVol.get(time);
-
-					Double standard = testers.get(tankID);
-					Double actual = actuals.get(tankID);
-					Double value = new Double(0);
-					if (!actual.equals(0D))
-						value = actual / standard; // uzyskujemy jaki procent odchyłu
-					value = Math.abs(value);
-
-					if (value > 2.60) {
-						System.out.println("Probability of leakage on tank #" + tankID + " at " + time.toString());
-						System.out.println("Delta: " + value + "%");
-						counter++;
-					}
-
-				}
-			}
-
+		HashMap<Times, HashMap<Long, Double>> hoursVol = tanks.getVolumeTotals(tanks.splitDates(Period.HOUR));
+		
+		for(Integer hour : hoursAvg.keySet()) {
+			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
+			System.out.println("Variance for tank 1 for hour " +hour+ " equals " + tanksValues.get(1L));					
 		}
-		System.out.println("COunter: " + counter);
+		
+		for(Integer hour : hoursAvg.keySet()) {
+			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
+			System.out.println("Variance for tank 2 for hour " +hour+ " equals " + tanksValues.get(2L));			
+		}
+		
+		for(Integer hour : hoursAvg.keySet()) {
+			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
+			System.out.println("Variance for tank 3 for hour " +hour+ " equals " + tanksValues.get(3L));			
+		}
+		
+		for(Integer hour : hoursAvg.keySet()) {
+			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
+			System.out.println("Variance for tank 4 for hour " +hour+ " equals " + tanksValues.get(4L));			
+		}
+		
+//		Integer counter = 0;
+//
+//		for (Times time : hoursVol.keySet()) {
+//			
+//			for (Integer hour : hoursAvg.keySet()) {
+//				if (time.getFrom().getHours() == hour) {
+//
+//					HashMap<Long, Double> testers = hoursAvg.get(hour);
+//					HashMap<Long, Double> actuals = hoursVol.get(time);
+//
+//					Double standard = testers.get(tankID);
+//					Double actual = actuals.get(tankID);
+//					Double value = new Double(0);
+//					if (!actual.equals(0D))
+//						value = actual / standard; // uzyskujemy jaki procent odchyłu
+//					value = Math.abs(value);
+//
+//					if (value > 2.50) {
+//						System.out.println("Probability of leakage on tank #" + tankID + " at " + time.toString());
+//						System.out.println("Delta: " + value + "%");
+//						counter++;
+//					}
+//
+//				}
+//			}
+//
+//		}
+//		System.out.println("COunter: " + counter);
 
 	}
 

@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+
 import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
 import pl.woleszko.polsl.model.entities.Entity;
@@ -25,9 +27,9 @@ public class TankDataExtractor extends DataExtractor {
 	}
 
 	// Returns Hashmap<Periods, Hashmap<TankID, VolTot>>
-	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(HashMap<Long, Times> times) {
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
-		HashMap<Long, Times> times = this.splitDates(period);
+		//HashMap<Long, Times> times = this.splitDates(period);
 		Set<Long> periodKeys = times.keySet();
 		Double startVol;
 		Double endVol;
@@ -62,6 +64,7 @@ public class TankDataExtractor extends DataExtractor {
 
 		return totals;
 	}
+	
 
 	// Srednie dzienne,godzinowe itp
 	public HashMap<Long, Double> getAverageDeltasOf(Period period) {
@@ -70,8 +73,8 @@ public class TankDataExtractor extends DataExtractor {
 		for (Long tank : this.getTanksIndexes()) {
 			avg.put(tank, 0.0);
 		}
-
-		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(period);
+		HashMap<Long, Times> times = this.splitDates(period);
+		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 
 		for (Times timePeriod : totals.keySet()) {
 			HashMap<Long, Double> tanksTotals = totals.get(timePeriod);
@@ -99,8 +102,9 @@ public class TankDataExtractor extends DataExtractor {
 	 * @return
 	 */
 	public HashMap<Integer, HashMap<Long, Double>> getHoursTrend() {
-
-		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(Period.HOUR);
+		
+		HashMap<Long, Times> times = this.splitDates(Period.HOUR);
+		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<Integer, HashMap<Long, Double>>();
 
 		for (Times timePeriod : totals.keySet()) {
@@ -182,23 +186,43 @@ public class TankDataExtractor extends DataExtractor {
 		return avg;
 	}
 
-	public HashMap<Integer, HashMap<Long, Double>> getPeriodTrends(Period period) {
-
-		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(Period.HOUR);
+/**
+ * 	
+ * @return medians of each tank in hours of the day
+ */
+	public HashMap<Integer, HashMap<Long, Double>> getTanksHourMedian() {
+		HashMap<Long, Times> times = this.splitDates(Period.HOUR);
+		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<Integer, HashMap<Long, Double>>();
 
 		for (Times timePeriod : totals.keySet()) {
 			if (!avg.containsKey(timePeriod.getFrom().getHours())) {
-				System.out.println("New hour!");
-
-				// Wyliczone srednie dla konkretnej godziny dla konkretnego tanka
-				HashMap<Long, Double> hourMedians = new HashMap<Long, Double>();
-
-				// Wyszukane wartosci zbiornika dla konkretnych dni dla kontetnego tanka
-				HashMap<Long, ArrayList<Double>> tanksValues = new HashMap<Long, ArrayList<Double>>();
 				
-//				DescriptiveStatistics descriptiveStatistics = new DescriptiveStatistics();
+				System.out.println("New hour!");
+				HashMap<Long, Double> hourMedians = new HashMap<Long, Double>();
+				HashMap<Long, DescriptiveStatistics> hourTotals = new HashMap<Long, DescriptiveStatistics>();
+				
+				for(Long tank : this.getTanksIndexes()) {
+					DescriptiveStatistics statistics = new DescriptiveStatistics();
+					hourTotals.put(tank, statistics);
+				}
+				
+				//Totals loading
+				for (Times currTimePeriod : totals.keySet()) {
+					if (currTimePeriod.getFrom().getHours() == timePeriod.getFrom().getHours()) {
+						for (Long tank : this.getTanksIndexes()) {
+							DescriptiveStatistics values = hourTotals.get(tank);
+							values.addValue(totals.get(currTimePeriod).get(tank));
+							hourTotals.put(tank, values);
+						}
 
+					}
+				}
+				for(Long tank : hourTotals.keySet()) {
+					Double variance = hourTotals.get(tank).getPercentile(50);
+					hourMedians.put(tank, variance);
+				}
+				
 				avg.put(timePeriod.getFrom().getHours(), hourMedians);
 			}
 		}

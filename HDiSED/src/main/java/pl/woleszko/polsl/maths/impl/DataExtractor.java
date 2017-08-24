@@ -183,6 +183,19 @@ public abstract class DataExtractor {
 		return this.splitDates(period).size();
 	}
 
-	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period);
+	public ArrayList<Entity> sortEntityListByDate(ArrayList<Entity> entityList){
+	Collections.sort(entityList, new Comparator<Entity>() {
+		@Override
+		public int compare(Entity o1, Entity o2) {
+			// TODO Auto-generated method stub
+			Long obj1 = o1.getDate().getTime();
+			Long obj2 = o2.getDate().getTime();
+			return obj1.compareTo(obj2);
+		}
+	});
+	return entityList;
+	}
+	
+	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(HashMap<Long, Times> times);
 
 }
