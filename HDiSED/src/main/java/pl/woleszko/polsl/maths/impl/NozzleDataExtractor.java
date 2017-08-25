@@ -25,7 +25,7 @@ public class NozzleDataExtractor extends DataExtractor {
 		}
 	}
 
-	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(HashMap<Long, Times> times) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times) {
 
 		Double curr = new Double(0);
 		Double endVol = new Double(0);
@@ -34,9 +34,9 @@ public class NozzleDataExtractor extends DataExtractor {
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
 		// HashMap<Long, Times> times = this.splitDates(period);
-		Set<Long> periodKeys = times.keySet();
+		//Set<Long> periodKeys = times.keySet();
 
-		for (Long key : periodKeys) {
+		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (NozzleMeasuresEntity entity : entities) {
 
@@ -45,26 +45,26 @@ public class NozzleDataExtractor extends DataExtractor {
 
 				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
 				// wylicza delte
-				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
+				if (entity.getDate().getTime() == key.getTo().getTime()) {
 					curr = tanksVolume.get(entity.getTankId());
 					endVol = entity.getTotalCounter();
 					curr = endVol + curr;
 					tanksVolume.put(entity.getTankId(), curr);
 				}
 
-				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) {
+				if (entity.getDate().getTime() == key.getFrom().getTime()) {
 					curr = tanksVolume.get(entity.getTankId());
 					startVol = entity.getTotalCounter();
 					curr = curr - startVol;
 					tanksVolume.put(entity.getTankId(), curr);
 				}
 			}
-			totals.put(times.get(key), tanksVolume);
+			totals.put(key, tanksVolume);
 		}
 		return totals;
 	}
 
-	public HashMap<Times, HashMap<Long, Double>> getTransactionTotals(HashMap<Long, Times> times) {
+	public HashMap<Times, HashMap<Long, Double>> getTransactionTotals(ArrayList<Times> times) {
 
 		Double curr = new Double(0);
 		Double endVol = new Double(0);
@@ -73,9 +73,9 @@ public class NozzleDataExtractor extends DataExtractor {
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
 		// HashMap<Long, Times> times = this.splitDates(period);
-		Set<Long> periodKeys = times.keySet();
+//		Set<Long> periodKeys = times.keySet();
 
-		for (Long key : periodKeys) {
+		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (NozzleMeasuresEntity entity : entities) {
 
@@ -84,13 +84,13 @@ public class NozzleDataExtractor extends DataExtractor {
 
 				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
 				// wylicza delte
-				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
+				if (entity.getDate().getTime() == key.getTo().getTime()) {
 					endVol = entity.getLiterCounter();
 					tanksVolume.put(entity.getTankId(), endVol);
 				}
 
 			}
-			totals.put(times.get(key), tanksVolume);
+			totals.put(key, tanksVolume);
 		}
 		return totals;
 	}
@@ -98,8 +98,8 @@ public class NozzleDataExtractor extends DataExtractor {
 	/**
 	 * 1. Long - nozzleId 2. Long index
 	 */
-	public HashMap<Long, HashMap<Long, Times>> getUsagePeriods() {
-		HashMap<Long, HashMap<Long, Times>> usagePeriods = new HashMap<Long, HashMap<Long, Times>>();
+	public HashMap<Long, ArrayList<Times>> getUsagePeriods() {
+		HashMap<Long, ArrayList<Times>> usagePeriods = new HashMap<Long, ArrayList<Times>>();
 
 		for (int i = 0; i < entities.size(); i++) {
 			NozzleMeasuresEntity currEntity = entities.get(i);
@@ -126,11 +126,11 @@ public class NozzleDataExtractor extends DataExtractor {
 				if (endDate != null) {
 					Times period = new Times(startDate, endDate);
 					if (!usagePeriods.containsKey(currentNozzle)) {
-						HashMap<Long, Times> timesList = new HashMap<Long, Times>();
+						ArrayList<Times> timesList = new ArrayList<Times>();
 						usagePeriods.put(currentNozzle, timesList);
 					}
-					HashMap<Long, Times> timesList = usagePeriods.get(currentNozzle);
-					timesList.put((long) i, period);
+					ArrayList<Times> timesList = usagePeriods.get(currentNozzle);
+					timesList.add(period);
 					usagePeriods.put(currentNozzle, timesList);
 				} else {
 					System.out.println("Error getting usage periods! Abort... ");

@@ -27,15 +27,15 @@ public class TankDataExtractor extends DataExtractor {
 	}
 
 	// Returns Hashmap<Periods, Hashmap<TankID, VolTot>>
-	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(HashMap<Long, Times> times) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times) {
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 		//HashMap<Long, Times> times = this.splitDates(period);
-		Set<Long> periodKeys = times.keySet();
+		//Set<Long> periodKeys = times.keySet();
 		Double startVol;
 		Double endVol;
 		Double curr = new Double(0);
 
-		for (Long key : periodKeys) {
+		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (TankMeasuresEntity entity : entities) {
 				// Jezeli nie ma tanka to dodaj
@@ -44,21 +44,21 @@ public class TankDataExtractor extends DataExtractor {
 
 				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
 				// wylicza delte
-				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
+				if (entity.getDate().getTime() == key.getTo().getTime()) {
 					curr = tanksVolume.get(entity.getTankId());
 					endVol = entity.getFuelVol();
 					curr = curr - endVol;
 					tanksVolume.put(entity.getTankId(), curr);
 				}
 
-				if (entity.getDate().getTime() == times.get(key).getFrom().getTime()) {
+				if (entity.getDate().getTime() == key.getFrom().getTime()) {
 					curr = tanksVolume.get(entity.getTankId());
 					startVol = entity.getFuelVol();
 					curr = curr + startVol;
 					tanksVolume.put(entity.getTankId(), curr);
 				}
 			}
-			totals.put(times.get(key), tanksVolume);
+			totals.put(key, tanksVolume);
 
 		}
 
@@ -73,7 +73,7 @@ public class TankDataExtractor extends DataExtractor {
 		for (Long tank : this.getTanksIndexes()) {
 			avg.put(tank, 0.0);
 		}
-		HashMap<Long, Times> times = this.splitDates(period);
+		ArrayList<Times> times = this.splitDates(period);
 		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 
 		for (Times timePeriod : totals.keySet()) {
@@ -103,7 +103,7 @@ public class TankDataExtractor extends DataExtractor {
 	 */
 	public HashMap<Integer, HashMap<Long, Double>> getHoursTrend() {
 		
-		HashMap<Long, Times> times = this.splitDates(Period.HOUR);
+		ArrayList<Times> times = this.splitDates(Period.HOUR);
 		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<Integer, HashMap<Long, Double>>();
 
@@ -191,7 +191,7 @@ public class TankDataExtractor extends DataExtractor {
  * @return medians of each tank in hours of the day
  */
 	public HashMap<Integer, HashMap<Long, Double>> getTanksHourMedian() {
-		HashMap<Long, Times> times = this.splitDates(Period.HOUR);
+		ArrayList<Times> times = this.splitDates(Period.HOUR);
 		HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
 		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<Integer, HashMap<Long, Double>>();
 

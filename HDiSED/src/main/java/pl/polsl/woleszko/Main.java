@@ -23,7 +23,7 @@ public class Main {
 		// TODO Auto-generated method stub
 		
 		DataAnalizer extractor = new DataAnalizer();
-		extractor.checkNozzles();
+		extractor.detect();
 //		
 //		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
 //		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
