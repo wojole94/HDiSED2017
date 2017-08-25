@@ -33,7 +33,7 @@ public class NozzleDataExtractor extends DataExtractor {
 
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
-//		HashMap<Long, Times> times = this.splitDates(period);
+		// HashMap<Long, Times> times = this.splitDates(period);
 		Set<Long> periodKeys = times.keySet();
 
 		for (Long key : periodKeys) {
@@ -64,9 +64,39 @@ public class NozzleDataExtractor extends DataExtractor {
 		return totals;
 	}
 
+	public HashMap<Times, HashMap<Long, Double>> getTransactionTotals(HashMap<Long, Times> times) {
+
+		Double curr = new Double(0);
+		Double endVol = new Double(0);
+		Double startVol = new Double(0);
+
+		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
+
+		// HashMap<Long, Times> times = this.splitDates(period);
+		Set<Long> periodKeys = times.keySet();
+
+		for (Long key : periodKeys) {
+			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
+			for (NozzleMeasuresEntity entity : entities) {
+
+				if (!tanksVolume.containsKey(entity.getTankId()))
+					tanksVolume.put(entity.getTankId(), (double) 0);
+
+				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
+				// wylicza delte
+				if (entity.getDate().getTime() == times.get(key).getTo().getTime()) {
+					endVol = entity.getLiterCounter();
+					tanksVolume.put(entity.getTankId(), endVol);
+				}
+
+			}
+			totals.put(times.get(key), tanksVolume);
+		}
+		return totals;
+	}
+
 	/**
-	 * Long - nozzleId
-	 * 
+	 * 1. Long - nozzleId 2. Long index
 	 */
 	public HashMap<Long, HashMap<Long, Times>> getUsagePeriods() {
 		HashMap<Long, HashMap<Long, Times>> usagePeriods = new HashMap<Long, HashMap<Long, Times>>();
@@ -78,42 +108,51 @@ public class NozzleDataExtractor extends DataExtractor {
 				Date startDate = entities.get(i).getDate();
 				Date endDate = null;
 				Long currentNozzle = entities.get(i).getNozId();
-
-				int j = i;
-				while(entities.get(j).getStatus().equals(0) && !(entities.get(j).getNozId().equals(currentNozzle))) {
+				Date previous = startDate;
+				
+				int j = i + 1;
+				do {
+					if ((entities.get(j).getNozId().equals(currentNozzle))
+						&& (entities.get(j).getStatus().equals(0)))
+						previous = entities.get(j).getDate();
+					
+					if ((entities.get(j).getStatus().equals(1)) 
+						&& (entities.get(j).getNozId().equals(currentNozzle))) 
+						endDate = previous;
+										
 					j++;
-				}
-				endDate = entities.get(j).getDate();
-								
-				Times period = new Times(startDate, endDate);
-				
-				if(!usagePeriods.containsKey(currentNozzle)) {
-					HashMap<Long, Times> timesList = new HashMap<Long, Times>();
+				} while (endDate == null && j < entities.size());
+
+				if (endDate != null) {
+					Times period = new Times(startDate, endDate);
+					if (!usagePeriods.containsKey(currentNozzle)) {
+						HashMap<Long, Times> timesList = new HashMap<Long, Times>();
+						usagePeriods.put(currentNozzle, timesList);
+					}
+					HashMap<Long, Times> timesList = usagePeriods.get(currentNozzle);
+					timesList.put((long) i, period);
 					usagePeriods.put(currentNozzle, timesList);
+				} else {
+					System.out.println("Error getting usage periods! Abort... ");
+					return usagePeriods;
 				}
-				
-				HashMap<Long, Times> timesList = usagePeriods.get(currentNozzle);
-				timesList.put((long) i, period);
-				
 			}
+
 		}
 
 		return usagePeriods;
 	}
 
 	/**
-	 * Returns the list which specify which nozzle correspond to which tank
-	 * HashMap elems:
-	 * 		1. Long - nozzle
-	 * 		2. Long - tank
+	 * Returns the list which specify which nozzle correspond to which tank HashMap
+	 * elems: 1. Long - nozzle 2. Long - tank
 	 */
 	public HashMap<Long, Long> getNozzlesAssign() {
-		
+
 		HashMap<Long, Long> assigns = new HashMap<Long, Long>();
-		
-		
-		for(NozzleMeasuresEntity entity : entities) {
-			if(!assigns.containsKey(entity.getNozId())) {
+
+		for (NozzleMeasuresEntity entity : entities) {
+			if (!assigns.containsKey(entity.getNozId())) {
 				assigns.put(entity.getNozId(), entity.getTankId());
 			}
 		}

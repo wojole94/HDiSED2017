@@ -22,10 +22,11 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		NozzleDataExtractor extractor = new NozzleDataExtractor();
+		DataAnalizer extractor = new DataAnalizer();
+		extractor.checkNozzles();
 //		
-		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
-		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
+//		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
+//		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
 //		HashMap<Integer, HashMap<Long, Double>> list = extractor.getHoursTrend();
 //		
 //		
@@ -36,15 +37,15 @@ public class Main {
 ////		HashMap<Long, Double> list = extractor.getVolumeTotals(Period.FULL_TIME);
 ////		
 //		Integer counter = 0;
-		for(Long key : list.keySet()) {
-			System.out.println("Nozzle #" + key);
-			for(Long time : list.get(key).keySet())
-			System.out.println("Usage period: " + list.get(key).get(time).getFrom().toString() + " --> " + list.get(key).get(time).getTo().toString()+ " on nozzle #" + key);
-		}
-		
-		for(Long nozzle : assignments.keySet()) {
-			System.out.println("Nozzle #" + nozzle + " is attached to tank #" + assignments.get(nozzle));			
-		}
+//		for(Long key : list.keySet()) {
+//			System.out.println("Nozzle #" + key);
+//			for(Long time : list.get(key).keySet())
+//			System.out.println("Usage period: " + list.get(key).get(time).getFrom().toString() + " --> " + list.get(key).get(time).getTo().toString()+ " on nozzle #" + key);
+//		}
+//		
+//		for(Long nozzle : assignments.keySet()) {
+//			System.out.println("Nozzle #" + nozzle + " is attached to tank #" + assignments.get(nozzle));			
+//		}
 //			HashMap<Long, Double> tanksTotals = list.get(key);
 //			// odczyt z tankow
 //			for(Long tank : tanksTotals.keySet()) {

@@ -20,7 +20,7 @@ public class DataAnalizer {
 		HashMap<Times, HashMap<Long, Double>> nozzleVolumes = nozzles.getVolumeTotals(nozzleTimes);
 		HashMap<Long, Times> refuelTimes = refuels.splitDates(Period.FULL_TIME);		
 		HashMap<Times, HashMap<Long, Double>> refuelVolumes = refuels.getVolumeTotals(refuelTimes);
-		HashMap<Long, Times> tankTimes = nozzles.splitDates(Period.FULL_TIME);
+		HashMap<Long, Times> tankTimes = tanks.splitDates(Period.FULL_TIME);
 		HashMap<Times, HashMap<Long, Double>> tankVolumes = tanks.getVolumeTotals(tankTimes);
 
 		Set<Long> tanksList = tanks.getTanksIndexes();
@@ -147,6 +147,46 @@ public class DataAnalizer {
 //		}
 //		System.out.println("COunter: " + counter);
 
+	}
+	
+	public void checkNozzles() {
+		HashMap<Long, HashMap<Long, Times>> nozzleUsageMap = nozzles.getUsagePeriods();
+		for(Long nozzle : nozzleUsageMap.keySet()) {
+			System.out.println("Checking nozzle #" + nozzle);
+			HashMap<Long, Times> nozzleUsageTimes = nozzleUsageMap.get(nozzle);
+			HashMap<Long, Times> tankPeriods = tanks.splitDates(300000L);
+			
+			HashMap<Times, HashMap<Long, Double>> tankVolumesTotals = tanks.getVolumeTotals(tankPeriods);	//tutaj powinien zbierac totale z okresow w ktorych nastapilo tankowanie
+			HashMap<Times, HashMap<Long, Double>> nozzleVolumesTotals = nozzles.getTransactionTotals(nozzleUsageTimes); //tutaj powinien zbierac calkowite licznik transakcji
+			
+			
+			
+			for(Long period : nozzleUsageTimes.keySet()) {
+				HashMap<Long, Double> tanksCounters = null;
+				
+				for(Times tankPeriod : tankVolumesTotals.keySet()) {
+					if(tankPeriod.dateInPeriod(nozzleUsageTimes.get(period).getTo())) {
+						tanksCounters = tankVolumesTotals.get(tankPeriod);
+					}
+				}
+				
+				
+				if(tanksCounters != null) {
+				HashMap<Long, Double> nozzleCounters = nozzleVolumesTotals.get(nozzleUsageTimes.get(period));
+				
+				for(Long tank : tanks.getTanksIndexes()) {
+					Double delta = nozzleCounters.get(tank) - tanksCounters.get(tank);
+					Math.abs(delta);
+					if(delta > 5.0) System.out.println("Error detected at " + nozzleUsageTimes.get(period).getFrom() + " related to tank " + tank + ". Delta = " + delta);
+				}
+				} else {
+					System.out.println("Error in checking nozzle.. Abort..");
+				}
+				
+			}
+			
+		}
+		
 	}
 
 	public double getAvgVariancePerHour(Double variance) {
