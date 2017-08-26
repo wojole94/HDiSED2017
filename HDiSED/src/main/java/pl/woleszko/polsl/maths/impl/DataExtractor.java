@@ -24,7 +24,7 @@ public abstract class DataExtractor {
 
 	}
 
-	public HashMap<Long, Times> splitDates(Period swPeriod) {
+	public ArrayList<Times> splitDates(Period swPeriod) {
 
 		switch (swPeriod) {
 		case FULL_TIME: {
@@ -38,8 +38,8 @@ public abstract class DataExtractor {
 					firstDate = entity.getDate();
 			}
 			Times dates = new Times(firstDate, lastDate);
-			HashMap<Long, Times> result = new HashMap<Long, Times>();
-			result.put(key, dates);
+			ArrayList<Times> result = new ArrayList<Times>();
+			result.add(dates);
 			return result;
 		}
 		case MONTH: {
@@ -87,7 +87,13 @@ public abstract class DataExtractor {
 
 				}
 			}
-			return result;
+			
+			ArrayList<Times> exactRes = new ArrayList<Times>();
+			for(Long key : result.keySet()) {
+				exactRes.add(result.get(key));
+			}
+			
+			return exactRes;
 		}
 		case HOUR: {
 
@@ -124,16 +130,21 @@ public abstract class DataExtractor {
 					System.out.println("---------------------->>");
 				}
 			}
-			return result;
+			ArrayList<Times> exactRes = new ArrayList<Times>();
+			for(Long key : result.keySet()) {
+				exactRes.add(result.get(key));
+			}
+			
+			return exactRes;
 		}
 
 		}
 		return null;
 	}
 
-	public HashMap<Long, Times> splitDates(Long customPeriodInMilis) {
+	public ArrayList<Times> splitDates(Long customPeriodInMilis) {
 
-		HashMap<Long, Times> result = new HashMap<Long, Times>();
+		ArrayList<Times> result = new ArrayList<Times>();
 		ArrayList<Date> dateList = new ArrayList<Date>();
 
 		for (Entity entity : list) {
@@ -161,7 +172,7 @@ public abstract class DataExtractor {
 
 				lastDateOfPeriod = dateList.get(i);
 				Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
-				result.put((long) i, time);
+				result.add(time);
 
 				firstDateOfPeriod = dateList.get(i);
 				lastDateOfPeriod = null;
@@ -173,7 +184,7 @@ public abstract class DataExtractor {
 		if (lastDateOfPeriod == null) {
 			lastDateOfPeriod = dateList.get(dateList.size() - 1);
 			Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
-			result.put((long) dateList.size(), time);
+			result.add(time);
 		}
 
 		return result;
@@ -183,6 +194,19 @@ public abstract class DataExtractor {
 		return this.splitDates(period).size();
 	}
 
-	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period);
+	public ArrayList<Entity> sortEntityListByDate(ArrayList<Entity> entityList){
+	Collections.sort(entityList, new Comparator<Entity>() {
+		@Override
+		public int compare(Entity o1, Entity o2) {
+			// TODO Auto-generated method stub
+			Long obj1 = o1.getDate().getTime();
+			Long obj2 = o2.getDate().getTime();
+			return obj1.compareTo(obj2);
+		}
+	});
+	return entityList;
+	}
+	
+	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times);
 
 }

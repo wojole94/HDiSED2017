@@ -23,16 +23,16 @@ public class RefuelDataExtractor extends DataExtractor {
 	}
 
 	@Override
-	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(Period period) {
+	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times) {
 
 //		Date date = entities.get(entities.size() - 1).getDate();
 
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
-		HashMap<Long, Times> times = splitDates(period);
-		Set<Long> periodKeys = times.keySet();
+//		HashMap<Long, Times> times = splitDates(period);
+		//Set<Long> periodKeys = times.keySet();
 
-		for (Long key : periodKeys) {
+		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (RefuelEntity entity : entities) {
 				
@@ -40,14 +40,14 @@ public class RefuelDataExtractor extends DataExtractor {
 					tanksVolume.put(entity.getTankId(), (double) 0);
 				
 				//Szuka czasu zawartego w okresie, jezeli tak to dla konkretnego zbiornika wylicza sume wplywow 
-				if (times.get(key).dateInPeriod(entity.getDate())) {
+				if (key.dateInPeriod(entity.getDate())) {
 					Double curr = tanksVolume.get(entity.getTankId());
 					Double totalVol = entity.getFuelVol();						
 					totalVol = totalVol + curr;
 					tanksVolume.put(entity.getTankId(), totalVol);
 				}
 			}
-			totals.put(times.get(key), tanksVolume);
+			totals.put(key, tanksVolume);
 		}
 		return totals;
 

@@ -22,9 +22,11 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-//		TankDataExtractor extractor = new TankDataExtractor();
+		DataAnalizer extractor = new DataAnalizer();
+		extractor.detect();
 //		
-////		HashMap<Long, Times> list = 
+//		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
+//		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
 //		HashMap<Integer, HashMap<Long, Double>> list = extractor.getHoursTrend();
 //		
 //		
@@ -35,8 +37,15 @@ public class Main {
 ////		HashMap<Long, Double> list = extractor.getVolumeTotals(Period.FULL_TIME);
 ////		
 //		Integer counter = 0;
-//		for(Integer key : list.keySet()) {
-//			System.out.println("Hour: " + key);
+//		for(Long key : list.keySet()) {
+//			System.out.println("Nozzle #" + key);
+//			for(Long time : list.get(key).keySet())
+//			System.out.println("Usage period: " + list.get(key).get(time).getFrom().toString() + " --> " + list.get(key).get(time).getTo().toString()+ " on nozzle #" + key);
+//		}
+//		
+//		for(Long nozzle : assignments.keySet()) {
+//			System.out.println("Nozzle #" + nozzle + " is attached to tank #" + assignments.get(nozzle));			
+//		}
 //			HashMap<Long, Double> tanksTotals = list.get(key);
 //			// odczyt z tankow
 //			for(Long tank : tanksTotals.keySet()) {
@@ -47,10 +56,11 @@ public class Main {
 ////		
 ////		System.out.println("counter: " + counter);
 		
-		DataExtractor analise = new TankDataExtractor();
-//		analise.detect();
-		analise.splitDates(Period.DAY);
-		analise.splitDates((long) 86400000);
+//		DataAnalizer analise = new DataAnalizer();
+//		analise.checkTank();
+//				analise.detect();
+//		analise.splitDates(Period.DAY);
+//		analise.splitDates((long) 86400000);
 //		analise.checkTank((long) 3);
 
 	}
