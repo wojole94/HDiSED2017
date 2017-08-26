@@ -1,104 +1,105 @@
 package pl.woleszko.polsl.model.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.File;
+import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
-import org.apache.camel.main.Main;
-import org.apache.camel.RoutesBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
-import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.SimpleRegistry;
-import org.apache.camel.spi.DataFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.camel.main.Main;
 
+import lombok.extern.slf4j.Slf4j;
 import pl.woleszko.polsl.model.entities.Entity;
-import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
-import pl.woleszko.polsl.model.entities.RefuelEntity;
-import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
 
+@Slf4j
+public class FileAccessorCSV<T extends Entity> implements FileAccessor<T> {
 
-public class FileAccessorCSV implements FileAccessor {
-	
 	private Main mainContext;
-	private CSVHandler csvHandler;
+	private CSVHandler<T> csvHandler;
+	private String directoryName;
 	private String fileName;
-	//private Logger log = LoggerFactory.getLogger(FileAccessorCSV.class);
-	
-	public FileAccessorCSV(String fileName){
-		csvHandler = new CSVHandler();
-		this.fileName = fileName;
-		configure();
+
+	public FileAccessorCSV(Class<T> type, String fileName) {
+
+	    File file = new File(fileName);
+
+	    //try to find in resources if there is no in default path
+	    file = file.exists() ? file : getFileFromResources(fileName);
+	    
+        csvHandler = new CSVHandler<>();
+        
+        this.fileName = file.getName();
+        this.directoryName = file.getParentFile().getAbsolutePath();
+        configure(type);	    
 	}
-	
-	@Override
-	public ArrayList<Entity> getValues() {
-		
-		return csvHandler.getList();
-		
+
+    @Override
+	public List<T> getValues() {
+        return csvHandler.getList();
 	}
 
-	@Override
-	public void configure() {
-		
-		//log.debug("||--------------------||");
-	//	log.debug("||---Configuring...---||");
-	//	log.debug("||--------------------||");
-		
-		// create a Main instance
-		mainContext = new Main();
-		// bind MyBean into the registry
-		mainContext.bind("csvHandlerBean", csvHandler);
-		mainContext.bind("terminate", this);
-		// add routes
-		mainContext.addRouteBuilder(new RouteBuilder() {
+    @Override
+    public void configure(Class<T> type) {
 
-			@Override
-			public void configure() throws Exception {
+        //  log.debug("||--------------------||");
+        //	log.debug("||---Configuring...---||");
+        //	log.debug("||--------------------||");
 
-				BindyCsvDataFormat bindy = null;
-				
-				if (fileName.equals("nozzleMeasures.csv"))
-				bindy = new BindyCsvDataFormat(NozzleMeasuresEntity.class);
-				if (fileName.equals("refuel.csv"))
-				bindy = new BindyCsvDataFormat(RefuelEntity.class);
-				if (fileName.equals("tankMeasures.csv"))
-				bindy = new BindyCsvDataFormat(TankMeasuresEntity.class);
-				
-				from("file:D:/Zestaw 1/?fileName="+fileName+"&delay=1000&noop=true")						
-						.unmarshal(bindy)
-						.to("bean:csvHandlerBean?method=csvHandler")
-						.to("bean:terminate?method=close");
+        // create a Main instance
+        mainContext = new Main();
+        // bind MyBean into the registry
+        mainContext.bind("csvHandlerBean", csvHandler);
+        mainContext.bind("terminate", this);
+        // add routes
 
-			}
+        mainContext.addRouteBuilder(new RouteBuilder() {
 
-		});	
-	
-//	// add event listener
-//	mainContext.addMainListener(new Events());
-	// run until you terminate the JVM
-	System.out.println("Starting Camel. Use ctrl + c to terminate the JVM.\n");
-	try {
+            @Override
+            public void configure() throws Exception {
+                BindyCsvDataFormat bindy = new BindyCsvDataFormat(type);
 
-		mainContext.run();
-		
-	
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-//	log.debug("||------------------------||");
-//	log.debug("||---Context started...---||");
-//	log.debug("||------------------------||");
-	}
-	
+                from("file:" + directoryName + "?fileName=" + fileName + "&delay=1000&noop=true")
+                    .unmarshal(bindy)
+		            .to("bean:csvHandlerBean?method=csvHandler")
+		            .to("bean:terminate?method=close");
+            }
+
+        });
+
+        //	// add event listener
+        //	mainContext.addMainListener(new Events());
+        // run until you terminate the JVM
+        System.out.println("Starting Camel. Use ctrl + c to terminate the JVM.\n");
+        try {
+
+            mainContext.run();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    //	log.debug("||------------------------||");
+    //	log.debug("||---Context started...---||");
+    //	log.debug("||------------------------||");
+    }
 
 	public void close() {
 		mainContext.completed();
 	}
 
+	/** Tries to load file from resources
+	 * @param fileName
+	 * @return
+	 */
+	private File getFileFromResources(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL url = classLoader.getResource(fileName);
+        
+        //TODO consider raising exception
+        if (url == null) {
+            //throw new FileNotFoundException(fileName);
+            log.error("File {} does not exists!", fileName);
+        }
+        
+        return new File(url.getFile());
+	}
 }

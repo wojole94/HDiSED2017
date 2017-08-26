@@ -12,14 +12,10 @@ import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
 import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
 
-public class RefuelDataExtractor extends DataExtractor {
-	ArrayList<RefuelEntity> entities = new ArrayList<RefuelEntity>();
+public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 
-	public RefuelDataExtractor() {
-		list = getEntities("refuel.csv");
-		for (Entity ent : list) {
-			entities.add((RefuelEntity) ent);
-		}
+    public RefuelDataExtractor(String extractedFilePath) {
+        super(RefuelEntity.class, extractedFilePath);
 	}
 
 	@Override
@@ -34,7 +30,7 @@ public class RefuelDataExtractor extends DataExtractor {
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
-			for (RefuelEntity entity : entities) {
+			for (RefuelEntity entity : getEntities()) {
 				
 				if (!tanksVolume.containsKey(entity.getTankId()))
 					tanksVolume.put(entity.getTankId(), (double) 0);

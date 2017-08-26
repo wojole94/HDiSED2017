@@ -12,9 +12,15 @@ import pl.woleszko.polsl.maths.objects.Times;
 
 public class DataAnalizer {
 
-	NozzleDataExtractor nozzles = new NozzleDataExtractor();
-	RefuelDataExtractor refuels = new RefuelDataExtractor();
-	TankDataExtractor tanks = new TankDataExtractor();
+	NozzleDataExtractor nozzles;
+	RefuelDataExtractor refuels;
+	TankDataExtractor tanks;
+	
+	public DataAnalizer() {        
+        nozzles = new NozzleDataExtractor("nozzleMeasures.csv");
+        refuels = new RefuelDataExtractor("refuel.csv");
+        tanks = new TankDataExtractor("tankMeasures.csv");
+	}
 
 	public HashMap<Long, Double> detect() {
 		ArrayList<Times> nozzleTimes = nozzles.splitDates(Period.FULL_TIME);

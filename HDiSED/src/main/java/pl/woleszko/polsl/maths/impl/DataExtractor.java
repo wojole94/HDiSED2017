@@ -13,15 +13,29 @@ import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
 import pl.woleszko.polsl.model.impl.FileAccessorCSV;
 
-public abstract class DataExtractor {
-	protected ArrayList<Entity> list;
+public abstract class DataExtractor<T extends Entity> {
+    private List<T> list;
+    
+    /** Konstruktor, który pozwala skojarzć typ obiektu z plikiem zawierającym dane dla tego obiektu 
+     * @param typeExtractedTo generyczny typ bazujący na klasie Entity, którego obiekty będą
+     *        wyciągane z pliku
+     * @param fileName ścieżka do pliku zawierającego dane reprezentowane przez podany typ
+     * @throws FileNotFoundException 
+     */
+    public DataExtractor(Class<T> typeExtractedTo, String fileNameExtractedFrom) {
+        FileAccessorCSV<T> access = new FileAccessorCSV<>(typeExtractedTo, fileNameExtractedFrom);
+        list = access.getValues();
 
-	protected ArrayList<Entity> getEntities(String fileName) {
-		// TODO Auto-generated method stub
-		FileAccessorCSV access = new FileAccessorCSV(fileName);
-		list = (ArrayList<Entity>) access.getValues();
+        // this.sortEntityListByDate((List<Entity>) list);     
+        // tak ^^^^ też się da, ale można prościej:
+        // Collections.sort() wymaga aby elementy listy 
+        // implementowały interface Comparable. W naszej klasie typ 
+        // generyczny T rozszerza klasę Entity, która spełnia ten warunek.
+        Collections.sort(list);
+    }  
+
+	protected List<T> getEntities() {
 		return list;
-
 	}
 
 	public ArrayList<Times> splitDates(Period swPeriod) {

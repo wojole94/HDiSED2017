@@ -5,7 +5,7 @@ import java.util.Date;
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 @CsvRecord(separator = ";")
-public class TankMeasuresEntity implements Entity{
+public class TankMeasuresEntity extends Entity{
 
 	@DataField(pos = 1, pattern="yyyy-MM-dd HH:mm:ss")
 	private Date date;
