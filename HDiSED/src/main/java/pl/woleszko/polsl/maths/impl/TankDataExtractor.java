@@ -13,13 +13,15 @@ import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
 import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
+import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 import pl.woleszko.polsl.model.impl.FileAccessorCSV;
 
 public class TankDataExtractor extends DataExtractor<TankMeasuresEntity> {
 
-    public TankDataExtractor(String extractedFilePath) {
-        super(TankMeasuresEntity.class, extractedFilePath); 
+    public TankDataExtractor(FileAccessor<TankMeasuresEntity> accessor) {
+        super(accessor); 
 	}
 
 	// Returns Hashmap<Periods, Hashmap<TankID, VolTot>>

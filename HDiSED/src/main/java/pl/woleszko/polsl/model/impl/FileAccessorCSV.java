@@ -47,18 +47,19 @@ public class FileAccessorCSV<T extends Entity> implements FileAccessor<T> {
 
         // create a Main instance
         mainContext = new Main();
+        
         // bind MyBean into the registry
         mainContext.bind("csvHandlerBean", csvHandler);
         mainContext.bind("terminate", this);
+        
         // add routes
-
         mainContext.addRouteBuilder(new RouteBuilder() {
 
             @Override
             public void configure() throws Exception {
                 BindyCsvDataFormat bindy = new BindyCsvDataFormat(type);
 
-                from("file:" + directoryName + "?fileName=" + fileName + "&delay=1000&noop=true")
+                from("file:" + directoryName + "?fileName=" + fileName + "&consumer.delay=1000&noop=true")
                     .unmarshal(bindy)
 		            .to("bean:csvHandlerBean?method=csvHandler")
 		            .to("bean:terminate?method=close");
@@ -94,9 +95,7 @@ public class FileAccessorCSV<T extends Entity> implements FileAccessor<T> {
         ClassLoader classLoader = getClass().getClassLoader();
         URL url = classLoader.getResource(fileName);
         
-        //TODO consider raising exception
         if (url == null) {
-            //throw new FileNotFoundException(fileName);
             log.error("File {} does not exists!", fileName);
         }
         

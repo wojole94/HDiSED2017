@@ -11,11 +11,12 @@ import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
 import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 
 public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 
-    public RefuelDataExtractor(String extractedFilePath) {
-        super(RefuelEntity.class, extractedFilePath);
+    public RefuelDataExtractor(FileAccessor<RefuelEntity> accessor) {
+        super(accessor);
 	}
 
 	@Override

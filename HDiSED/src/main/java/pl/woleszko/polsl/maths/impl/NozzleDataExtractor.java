@@ -7,14 +7,15 @@ import java.util.List;
 
 import pl.woleszko.polsl.maths.objects.Times;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 
 public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
-    //  this is not needed anyway. Parametrized class DataExtractor, 
+    //  this is not needed anyway. Parametrized class DataHarverster, 
     //  returns elements already mapped to the proper Entity derived class
     //  ArrayList<NozzleMeasuresEntity> entities = new ArrayList<>();
 
-    public NozzleDataExtractor(String extractedFilePath) {
-        super(NozzleMeasuresEntity.class, extractedFilePath);
+    public NozzleDataExtractor(FileAccessor<NozzleMeasuresEntity> accessor) {
+        super(accessor);
 
     //    NOT NEEDED ANYMORE
     //      for (Entity ent : getEntities()) {
