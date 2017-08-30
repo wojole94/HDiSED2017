@@ -3,27 +3,25 @@ package pl.woleszko.polsl.maths.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-
-import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
-import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
 import pl.woleszko.polsl.model.impl.FileAccessor;
-import pl.woleszko.polsl.model.impl.FileAccessorCSV;
 
-public class NozzleDataExtractor extends DataExtractor {
-	ArrayList<NozzleMeasuresEntity> entities = new ArrayList<NozzleMeasuresEntity>();
+public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
+    //  this is not needed anyway. Parametrized class DataHarverster, 
+    //  returns elements already mapped to the proper Entity derived class
+    //  ArrayList<NozzleMeasuresEntity> entities = new ArrayList<>();
 
-	public NozzleDataExtractor() {
-		list = getEntities("nozzleMeasures.csv");
-		this.sortEntityListByDate(list);
-		for (Entity ent : list) {
-			entities.add((NozzleMeasuresEntity) ent);
-		}
-	}
+    public NozzleDataExtractor(FileAccessor<NozzleMeasuresEntity> accessor) {
+        super(accessor);
+
+    //    NOT NEEDED ANYMORE
+    //      for (Entity ent : getEntities()) {
+    //          entities.add((NozzleMeasuresEntity) ent);
+    //      }     
+    }
 
 	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times) {
 
@@ -38,7 +36,7 @@ public class NozzleDataExtractor extends DataExtractor {
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
-			for (NozzleMeasuresEntity entity : entities) {
+			for (NozzleMeasuresEntity entity : getEntities()) {
 
 				if (!tanksVolume.containsKey(entity.getTankId()))
 					tanksVolume.put(entity.getTankId(), (double) 0);
@@ -77,7 +75,7 @@ public class NozzleDataExtractor extends DataExtractor {
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
-			for (NozzleMeasuresEntity entity : entities) {
+			for (NozzleMeasuresEntity entity : getEntities()) {
 
 				if (!tanksVolume.containsKey(entity.getTankId()))
 					tanksVolume.put(entity.getTankId(), (double) 0);
@@ -100,6 +98,8 @@ public class NozzleDataExtractor extends DataExtractor {
 	 */
 	public HashMap<Long, ArrayList<Times>> getUsagePeriods() {
 		HashMap<Long, ArrayList<Times>> usagePeriods = new HashMap<Long, ArrayList<Times>>();
+		
+		List<NozzleMeasuresEntity> entities = getEntities(); 
 
 		for (int i = 0; i < entities.size(); i++) {
 			NozzleMeasuresEntity currEntity = entities.get(i);
@@ -151,7 +151,7 @@ public class NozzleDataExtractor extends DataExtractor {
 
 		HashMap<Long, Long> assigns = new HashMap<Long, Long>();
 
-		for (NozzleMeasuresEntity entity : entities) {
+		for (NozzleMeasuresEntity entity : getEntities()) {
 			if (!assigns.containsKey(entity.getNozId())) {
 				assigns.put(entity.getNozId(), entity.getTankId());
 			}

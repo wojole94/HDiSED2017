@@ -11,15 +11,12 @@ import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
 import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 
-public class RefuelDataExtractor extends DataExtractor {
-	ArrayList<RefuelEntity> entities = new ArrayList<RefuelEntity>();
+public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 
-	public RefuelDataExtractor() {
-		list = getEntities("refuel.csv");
-		for (Entity ent : list) {
-			entities.add((RefuelEntity) ent);
-		}
+    public RefuelDataExtractor(FileAccessor<RefuelEntity> accessor) {
+        super(accessor);
 	}
 
 	@Override
@@ -34,7 +31,7 @@ public class RefuelDataExtractor extends DataExtractor {
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
-			for (RefuelEntity entity : entities) {
+			for (RefuelEntity entity : getEntities()) {
 				
 				if (!tanksVolume.containsKey(entity.getTankId()))
 					tanksVolume.put(entity.getTankId(), (double) 0);

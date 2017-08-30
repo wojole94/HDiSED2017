@@ -9,12 +9,33 @@ import pl.woleszko.polsl.maths.impl.RefuelDataExtractor;
 import pl.woleszko.polsl.maths.impl.TankDataExtractor;
 import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
+import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
+import pl.woleszko.polsl.model.entities.RefuelEntity;
+import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
+import pl.woleszko.polsl.model.impl.FileAccessorCSV;
+import pl.woleszko.polsl.model.impl.FileAccessorZIP;
 
 public class DataAnalizer {
 
-	NozzleDataExtractor nozzles = new NozzleDataExtractor();
-	RefuelDataExtractor refuels = new RefuelDataExtractor();
-	TankDataExtractor tanks = new TankDataExtractor();
+	NozzleDataExtractor nozzles;
+	RefuelDataExtractor refuels;
+	TankDataExtractor tanks;
+	
+	public DataAnalizer() {        
+	    
+	    FileAccessor<RefuelEntity> refuelData;
+        FileAccessor<TankMeasuresEntity> tankData;
+        FileAccessor<NozzleMeasuresEntity> nozzleData; 
+        
+        refuelData = new FileAccessorCSV<>(RefuelEntity.class, "refuel.csv");
+        tankData = new FileAccessorZIP<>(TankMeasuresEntity.class, "tankMeasures.zip");
+        nozzleData = new FileAccessorZIP<>(NozzleMeasuresEntity.class, "nozzleMeasures.zip");
+	    
+        refuels = new RefuelDataExtractor(refuelData);
+        nozzles = new NozzleDataExtractor(nozzleData);
+        tanks = new TankDataExtractor(tankData);
+	}
 
 	public HashMap<Long, Double> detect() {
 		ArrayList<Times> nozzleTimes = nozzles.splitDates(Period.FULL_TIME);

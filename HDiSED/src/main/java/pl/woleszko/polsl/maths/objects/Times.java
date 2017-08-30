@@ -2,6 +2,9 @@ package pl.woleszko.polsl.maths.objects;
 
 import java.util.Date;
 
+import lombok.ToString;
+
+@ToString
 public class Times {
 	Date from;
 	Date to;
@@ -27,24 +30,6 @@ public class Times {
 
 	public Date getTo() {
 		return to;
-	}
-
-	@Override 
-	public String toString() {
-		String text = new String("Period: " 
-				+ from.getYear() + "-"
-				+ (from.getMonth() + 1) + "-"
-				+ from.getDate() + " "
-				+ from.getHours() + ":"
-				+ from.getMinutes() + ":"
-				+ from.getSeconds() + " -- >"
-				+ to.getYear() + "-"
-				+ (to.getMonth() + 1) + "-"
-				+ to.getDate() + " "
-				+ to.getHours() + ":"
-				+ to.getMinutes() + ":"
-				+ to.getSeconds() + " ");				
-		return text; 
 	}
 
 	@Override

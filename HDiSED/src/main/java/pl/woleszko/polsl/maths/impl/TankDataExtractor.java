@@ -13,17 +13,15 @@ import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
 import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
+import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 import pl.woleszko.polsl.model.impl.FileAccessorCSV;
 
-public class TankDataExtractor extends DataExtractor {
-	ArrayList<TankMeasuresEntity> entities = new ArrayList<TankMeasuresEntity>();
+public class TankDataExtractor extends DataExtractor<TankMeasuresEntity> {
 
-	public TankDataExtractor() {
-		getEntities("tankMeasures.csv");
-		for (Entity ent : list) {
-			entities.add((TankMeasuresEntity) ent);
-		}
+    public TankDataExtractor(FileAccessor<TankMeasuresEntity> accessor) {
+        super(accessor); 
 	}
 
 	// Returns Hashmap<Periods, Hashmap<TankID, VolTot>>
@@ -37,7 +35,7 @@ public class TankDataExtractor extends DataExtractor {
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
-			for (TankMeasuresEntity entity : entities) {
+			for (TankMeasuresEntity entity : getEntities()) {
 				// Jezeli nie ma tanka to dodaj
 				if (!tanksVolume.containsKey(entity.getTankId()))
 					tanksVolume.put(entity.getTankId(), (double) 0);
@@ -233,7 +231,7 @@ public class TankDataExtractor extends DataExtractor {
 		HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 		Integer count = new Integer(0);
 
-		for (TankMeasuresEntity entity : entities) {
+		for (TankMeasuresEntity entity : getEntities()) {
 			if (!tanksVolume.containsKey(entity.getTankId())) {
 				tanksVolume.put(entity.getTankId(), (double) 0);
 				count++;
@@ -245,7 +243,7 @@ public class TankDataExtractor extends DataExtractor {
 	public Set<Long> getTanksIndexes() {
 		Set<Long> keys = new HashSet<Long>();
 
-		for (TankMeasuresEntity entity : entities) {
+		for (TankMeasuresEntity entity : getEntities()) {
 			if (!keys.contains(entity.getTankId())) {
 				keys.add(entity.getTankId());
 			}
