@@ -14,7 +14,7 @@ public class Times {
 	public Boolean dateInPeriod(Date date) {
 		if (date.getTime() <= this.to.getTime() && date.getTime() >= this.from.getTime())
 			return true;
-		return true;
+		return false;
 	}
 
 	public Long getDuration() {
@@ -29,32 +29,24 @@ public class Times {
 		return to;
 	}
 
-	@Override 
-	public String toString() {
-		String text = new String("Period: " 
-				+ from.getYear() + "-"
-				+ (from.getMonth() + 1) + "-"
-				+ from.getDate() + " "
-				+ from.getHours() + ":"
-				+ from.getMinutes() + ":"
-				+ from.getSeconds() + " -- >"
-				+ to.getYear() + "-"
-				+ (to.getMonth() + 1) + "-"
-				+ to.getDate() + " "
-				+ to.getHours() + ":"
-				+ to.getMinutes() + ":"
-				+ to.getSeconds() + " ");				
-		return text; 
-	}
+//	@Override 
+//	public String toString() {
+//		String text = new String("Period: " 
+//				+ from.getYear() + "-"
+//				+ (from.getMonth() + 1) + "-"
+//				+ from.getDate() + " "
+//				+ from.getHours() + ":"
+//				+ from.getMinutes() + ":"
+//				+ from.getSeconds() + " -- >"
+//				+ to.getYear() + "-"
+//				+ (to.getMonth() + 1) + "-"
+//				+ to.getDate() + " "
+//				+ to.getHours() + ":"
+//				+ to.getMinutes() + ":"
+//				+ to.getSeconds() + " ");				
+//		return text; 
+//	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((from == null) ? 0 : from.hashCode());
-		result = prime * result + ((to == null) ? 0 : to.hashCode());
-		return result;
-	}
 
 	@Override
 	public boolean equals(Object obj) {

@@ -20,4 +20,5 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-csv/1.4/commons-csv-1.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/camel/camel-bindy/2.19.1/camel-bindy-2.19.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-simple/1.6.2/slf4j-simple-1.6.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectlombok/lombok/1.16.18/lombok-1.16.18.jar"/>
 </classpath>

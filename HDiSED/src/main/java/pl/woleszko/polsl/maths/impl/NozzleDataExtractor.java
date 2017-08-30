@@ -25,6 +25,7 @@ public class NozzleDataExtractor extends DataExtractor {
 		}
 	}
 
+	// Long is a nozzleID
 	public HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times) {
 
 		Double curr = new Double(0);
@@ -34,29 +35,29 @@ public class NozzleDataExtractor extends DataExtractor {
 		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
 
 		// HashMap<Long, Times> times = this.splitDates(period);
-		//Set<Long> periodKeys = times.keySet();
+		// Set<Long> periodKeys = times.keySet();
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
 			for (NozzleMeasuresEntity entity : entities) {
 
-				if (!tanksVolume.containsKey(entity.getTankId()))
-					tanksVolume.put(entity.getTankId(), (double) 0);
+				if (!tanksVolume.containsKey(entity.getNozId()))
+					tanksVolume.put(entity.getNozId(), (double) 0);
 
 				// Szuka czasu zgodnego z koncem okresu, jezeli tak to dla konkretnego zbiornika
 				// wylicza delte
 				if (entity.getDate().getTime() == key.getTo().getTime()) {
-					curr = tanksVolume.get(entity.getTankId());
+					curr = tanksVolume.get(entity.getNozId());
 					endVol = entity.getTotalCounter();
 					curr = endVol + curr;
-					tanksVolume.put(entity.getTankId(), curr);
+					tanksVolume.put(entity.getNozId(), curr);
 				}
 
 				if (entity.getDate().getTime() == key.getFrom().getTime()) {
-					curr = tanksVolume.get(entity.getTankId());
+					curr = tanksVolume.get(entity.getNozId());
 					startVol = entity.getTotalCounter();
 					curr = curr - startVol;
-					tanksVolume.put(entity.getTankId(), curr);
+					tanksVolume.put(entity.getNozId(), curr);
 				}
 			}
 			totals.put(key, tanksVolume);
@@ -64,16 +65,16 @@ public class NozzleDataExtractor extends DataExtractor {
 		return totals;
 	}
 
-	public HashMap<Times, HashMap<Long, Double>> getTransactionTotals(ArrayList<Times> times) {
+	public HashMap<Times, Double> getTransactionTotals(ArrayList<Times> times) {
 
 		Double curr = new Double(0);
 		Double endVol = new Double(0);
 		Double startVol = new Double(0);
 
-		HashMap<Times, HashMap<Long, Double>> totals = new HashMap<Times, HashMap<Long, Double>>();
+		HashMap<Times, Double> totals = new HashMap<Times, Double>();
 
 		// HashMap<Long, Times> times = this.splitDates(period);
-//		Set<Long> periodKeys = times.keySet();
+		// Set<Long> periodKeys = times.keySet();
 
 		for (Times key : times) {
 			HashMap<Long, Double> tanksVolume = new HashMap<Long, Double>();
@@ -86,55 +87,70 @@ public class NozzleDataExtractor extends DataExtractor {
 				// wylicza delte
 				if (entity.getDate().getTime() == key.getTo().getTime()) {
 					endVol = entity.getLiterCounter();
-					tanksVolume.put(entity.getTankId(), endVol);
+
+					// tanksVolume.put(entity.getTankId(), endVol); - wariant z podzialem na
+					// zbiorniki
 				}
 
 			}
-			totals.put(key, tanksVolume);
+			totals.put(key, endVol);
 		}
 		return totals;
 	}
 
 	/**
-	 * 1. Long - nozzleId 2. Long index
+	 * 1. Long - nozzleId
 	 */
-	public HashMap<Long, ArrayList<Times>> getUsagePeriods() {
-		HashMap<Long, ArrayList<Times>> usagePeriods = new HashMap<Long, ArrayList<Times>>();
 
+	public HashMap<Times, Long> getUsagePeriods() {
+
+		HashMap<Times, Long> usagePeriods = new HashMap<Times, Long>();
+		Boolean stopFlag = false;
 		for (int i = 0; i < entities.size(); i++) {
 			NozzleMeasuresEntity currEntity = entities.get(i);
+			stopFlag = false;
 			if (entities.get(i).getStatus().equals(0)) {
 
-				Date startDate = entities.get(i).getDate();
-				Date endDate = null;
-				Long currentNozzle = entities.get(i).getNozId();
-				Date previous = startDate;
-				
-				int j = i + 1;
-				do {
-					if ((entities.get(j).getNozId().equals(currentNozzle))
-						&& (entities.get(j).getStatus().equals(0)))
-						previous = entities.get(j).getDate();
-					
-					if ((entities.get(j).getStatus().equals(1)) 
-						&& (entities.get(j).getNozId().equals(currentNozzle))) 
-						endDate = previous;
-										
-					j++;
-				} while (endDate == null && j < entities.size());
-
-				if (endDate != null) {
-					Times period = new Times(startDate, endDate);
-					if (!usagePeriods.containsKey(currentNozzle)) {
-						ArrayList<Times> timesList = new ArrayList<Times>();
-						usagePeriods.put(currentNozzle, timesList);
+				for (Times period : usagePeriods.keySet()) {
+					if (period.dateInPeriod(entities.get(i).getDate())
+							&& usagePeriods.get(period).equals(entities.get(i).getNozId())) {
+						stopFlag = true;
 					}
-					ArrayList<Times> timesList = usagePeriods.get(currentNozzle);
-					timesList.add(period);
-					usagePeriods.put(currentNozzle, timesList);
-				} else {
-					System.out.println("Error getting usage periods! Abort... ");
-					return usagePeriods;
+				}
+
+				if (!stopFlag) {
+					Date startDate = entities.get(i).getDate();
+					Date endDate = null;
+					Long currentNozzle = entities.get(i).getNozId();
+					// Date previous = startDate;
+
+					int j = i + 1;
+					do {
+						// if ((entities.get(j).getNozId().equals(currentNozzle))
+						// && (entities.get(j).getStatus().equals(0)))
+						// previous = entities.get(j).getDate();
+
+						if ((entities.get(j).getStatus().equals(1))
+								&& (entities.get(j).getNozId().equals(currentNozzle)))
+							endDate = /* previous */ entities.get(j).getDate();
+
+						j++;
+					} while (endDate == null && j < entities.size());
+
+					if (endDate != null) {
+
+						Times period = new Times(startDate, endDate);
+						if (!usagePeriods.containsKey(period)) {
+							usagePeriods.put(period, currentNozzle);
+						} else {
+							startDate.setTime(startDate.getTime() + 1);
+							period = new Times(startDate, endDate);
+							usagePeriods.put(period, currentNozzle);
+						}
+					} else {
+						System.out.println("Error getting usage periods! Abort... ");
+						return usagePeriods;
+					}
 				}
 			}
 

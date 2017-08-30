@@ -1,6 +1,8 @@
 package pl.woleszko.polsl.interpret;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -9,6 +11,7 @@ import pl.woleszko.polsl.maths.impl.RefuelDataExtractor;
 import pl.woleszko.polsl.maths.impl.TankDataExtractor;
 import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
+import pl.woleszko.polsl.model.entities.Entity;
 
 public class DataAnalizer {
 
@@ -19,7 +22,7 @@ public class DataAnalizer {
 	public HashMap<Long, Double> detect() {
 		ArrayList<Times> nozzleTimes = nozzles.splitDates(Period.FULL_TIME);
 		HashMap<Times, HashMap<Long, Double>> nozzleVolumes = nozzles.getVolumeTotals(nozzleTimes);
-		ArrayList<Times> refuelTimes = refuels.splitDates(Period.FULL_TIME);		
+		ArrayList<Times> refuelTimes = refuels.splitDates(Period.FULL_TIME);
 		HashMap<Times, HashMap<Long, Double>> refuelVolumes = refuels.getVolumeTotals(refuelTimes);
 		ArrayList<Times> tankTimes = tanks.splitDates(Period.FULL_TIME);
 		HashMap<Times, HashMap<Long, Double>> tankVolumes = tanks.getVolumeTotals(tankTimes);
@@ -31,14 +34,26 @@ public class DataAnalizer {
 		HashMap<Long, Double> refuelTotals = null;
 		HashMap<Long, Double> tankTotals = null;
 		HashMap<Long, Double> nozzleTotals = null;
+		HashMap<Long, Double> nozzleVolumesPerPistol = null;
 
 		for (Times key : periodKeys) {
 			System.out.println(key.toString());
 			// Totals initialization for tanks in periods (if not in period sets zeroes)
 
 			for (Times nozzleVolumesTime : nozzleVolumes.keySet()) {
-				if (key.dateInPeriod(nozzleVolumesTime.getFrom()) && key.dateInPeriod(nozzleVolumesTime.getTo()))
-					nozzleTotals = nozzleVolumes.get(nozzleVolumesTime);
+				//if (key.dateInPeriod(nozzleVolumesTime.getFrom()) && key.dateInPeriod(nozzleVolumesTime.getTo()))
+					nozzleVolumesPerPistol = nozzleVolumes.get(nozzleVolumesTime);
+				nozzleTotals = new HashMap<Long, Double>();
+				for (Long tank : tanksList) {
+					nozzleTotals.put(tank, new Double(0));
+				}
+				HashMap<Long, Long> nozzlesTankMapping = nozzles.getNozzlesAssign();
+				for (Long pistol : nozzleVolumesPerPistol.keySet()) {
+					double sum = nozzleTotals.get(nozzlesTankMapping.get(pistol));
+					sum = sum + nozzleVolumesPerPistol.get(pistol);
+					nozzleTotals.put(nozzlesTankMapping.get(pistol), sum);
+				}
+
 				break;
 			}
 
@@ -98,108 +113,147 @@ public class DataAnalizer {
 		HashMap<Integer, HashMap<Long, Double>> hoursAvg = tanks.getHoursTrend();
 
 		HashMap<Times, HashMap<Long, Double>> hoursVol = tanks.getVolumeTotals(tanks.splitDates(Period.HOUR));
-		
-		for(Integer hour : hoursAvg.keySet()) {
+
+		for (Integer hour : hoursAvg.keySet()) {
 			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
-			System.out.println("Variance for tank 1 for hour " +hour+ " equals " + tanksValues.get(1L));					
+			System.out.println("Variance for tank 1 for hour " + hour + " equals " + tanksValues.get(1L));
 		}
-		
-		for(Integer hour : hoursAvg.keySet()) {
+
+		for (Integer hour : hoursAvg.keySet()) {
 			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
-			System.out.println("Variance for tank 2 for hour " +hour+ " equals " + tanksValues.get(2L));			
+			System.out.println("Variance for tank 2 for hour " + hour + " equals " + tanksValues.get(2L));
 		}
-		
-		for(Integer hour : hoursAvg.keySet()) {
+
+		for (Integer hour : hoursAvg.keySet()) {
 			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
-			System.out.println("Variance for tank 3 for hour " +hour+ " equals " + tanksValues.get(3L));			
+			System.out.println("Variance for tank 3 for hour " + hour + " equals " + tanksValues.get(3L));
 		}
-		
-		for(Integer hour : hoursAvg.keySet()) {
+
+		for (Integer hour : hoursAvg.keySet()) {
 			HashMap<Long, Double> tanksValues = hoursAvg.get(hour);
-			System.out.println("Variance for tank 4 for hour " +hour+ " equals " + tanksValues.get(4L));			
+			System.out.println("Variance for tank 4 for hour " + hour + " equals " + tanksValues.get(4L));
 		}
-		
-//		Integer counter = 0;
-//
-//		for (Times time : hoursVol.keySet()) {
-//			
-//			for (Integer hour : hoursAvg.keySet()) {
-//				if (time.getFrom().getHours() == hour) {
-//
-//					HashMap<Long, Double> testers = hoursAvg.get(hour);
-//					HashMap<Long, Double> actuals = hoursVol.get(time);
-//
-//					Double standard = testers.get(tankID);
-//					Double actual = actuals.get(tankID);
-//					Double value = new Double(0);
-//					if (!actual.equals(0D))
-//						value = actual / standard; // uzyskujemy jaki procent odchyłu
-//					value = Math.abs(value);
-//
-//					if (value > 2.50) {
-//						System.out.println("Probability of leakage on tank #" + tankID + " at " + time.toString());
-//						System.out.println("Delta: " + value + "%");
-//						counter++;
-//					}
-//
-//				}
-//			}
-//
-//		}
-//		System.out.println("COunter: " + counter);
 
 	}
-	
-	public void checkNozzles() {
-		HashMap<Long, ArrayList<Times>> nozzleUsageMap = nozzles.getUsagePeriods();
-		for(Long nozzle : nozzleUsageMap.keySet()) {
-			System.out.println("Checking nozzle #" + nozzle);
-			ArrayList<Times> nozzleUsageTimes = nozzleUsageMap.get(nozzle);
-			ArrayList<Times> tankPeriods = tanks.splitDates(300000L);
-			
-			HashMap<Times, HashMap<Long, Double>> tankVolumesTotals = tanks.getVolumeTotals(tankPeriods);	//tutaj powinien zbierac totale z okresow w ktorych nastapilo tankowanie
-			
-			
-			HashMap<Times, HashMap<Long, Double>> nozzleVolumesTotals = nozzles.getTransactionTotals(nozzleUsageTimes); //tutaj powinien zbierac calkowite licznik transakcji
-			
-			
-			
-			for(Times period : nozzleUsageTimes) {
-				HashMap<Long, Double> tanksCounters = null;
-				
-				for(Times tankPeriod : tankVolumesTotals.keySet()) {
-					if(tankPeriod.dateInPeriod(period.getTo())) {
-						tanksCounters = tankVolumesTotals.get(tankPeriod);
+
+	public HashMap<Long, HashMap<Times, Double>> checkNozzles() {
+		HashMap<Times, Long> nozzleUsageMap = nozzles.getUsagePeriods();
+
+		ArrayList<Times> nozzleUsageTimes = new ArrayList<Times>();
+		for (Times period : nozzleUsageMap.keySet()) {
+			nozzleUsageTimes.add(period);
+		}
+
+		ArrayList<Times> tankPeriods = tanks.splitDates(300000L);
+
+		// Sorting lists by daytime
+		Collections.sort(nozzleUsageTimes, new Comparator<Times>() {
+			@Override
+			public int compare(Times t1, Times t2) {
+				// TODO Auto-generated method stub
+				Long obj1 = t1.getFrom().getTime();
+				Long obj2 = t2.getFrom().getTime();
+				return obj1.compareTo(obj2);
+			}
+		});
+
+		Collections.sort(tankPeriods, new Comparator<Times>() {
+			@Override
+			public int compare(Times t1, Times t2) {
+				// TODO Auto-generated method stubhg
+				Long obj1 = t1.getFrom().getTime();
+				Long obj2 = t2.getFrom().getTime();
+				return obj1.compareTo(obj2);
+			}
+		});
+
+		HashMap<Times, HashMap<Long, Double>> tankVolumesTotals = tanks.getVolumeTotals(tankPeriods);
+		HashMap<Times, HashMap<Long, Double>> nozzleVolumesTotals = nozzles.getVolumeTotals(nozzleUsageTimes);
+
+		HashMap<Long, HashMap<Times, Double>> nozzlesAnomalies = new HashMap<Long, HashMap<Times, Double>>();
+
+		Long refueledTank = new Long(0);
+		HashMap<Times, Long> refuelPeriods = refuels.getRefuelPeriods();
+		HashMap<Long, Long> tankMapping = nozzles.getNozzlesAssign();
+		//Przechodzenie po 5-minutowych okienkach odczytow ze zbiornikow 
+		for (int i = 0; i < tankPeriods.size(); i++) {
+			HashMap<Long, Double> nozzleSums = new HashMap<Long, Double>();
+			Set<Times> keys = refuelPeriods.keySet();
+			//Sprawdzanie czy ktorys zbiornik jest tankowany, jesli tak zapamietuje
+			for (Times period : keys) {
+				if ((period.dateInPeriod(tankPeriods.get(i).getFrom()))	|| (period.dateInPeriod(tankPeriods.get(i).getTo()))) {
+					Long temp = refuelPeriods.get(period);
+					refueledTank  = temp;
+				} 
+			}
+			//Przechodzenie po okresach uzycia pistoletow
+			for (int j = 0; j < nozzleUsageTimes.size(); j++) {
+				//sprawdzenie czy tankowanie odbywa sie w danym okresie odczytow zbiornika
+				if (tankPeriods.get(i).dateInPeriod(nozzleUsageTimes.get(j).getFrom())) {
+					Long currentNozzle = nozzleUsageMap.get(nozzleUsageTimes.get(j));
+					//sprawdzenie czy dany zbiornik (z ktorego pobierane jest paliwo) nie jest aktualnie napelniany
+					if (!(tankMapping.get(currentNozzle).equals(refueledTank))) {
+						if (nozzleSums.containsKey(currentNozzle)) {
+							Double sum = nozzleSums.get(currentNozzle);
+							sum = sum + nozzleVolumesTotals.get(nozzleUsageTimes.get(j))
+									.get(currentNozzle);
+							nozzleSums.put(currentNozzle, sum);
+						}
+
+						if (!nozzleSums.containsKey(currentNozzle)) {
+							Double sum = nozzleVolumesTotals.get(nozzleUsageTimes.get(j))
+									.get(currentNozzle);
+							nozzleSums.put(currentNozzle, sum);
+						}
 					}
 				}
-				
-				
-				if(tanksCounters != null) {
-				HashMap<Long, Double> nozzleCounters = nozzleVolumesTotals.get(period);
-				
-				for(Long tank : tanks.getTanksIndexes()) {
-					Double delta = nozzleCounters.get(tank) - tanksCounters.get(tank);
-					Math.abs(delta);
-					if(delta > 5.0) System.out.println("Error detected at " + period.getFrom() + " related to tank " + tank + ". Delta = " + delta);
+			}
+			//pobranie calkowitych odczytow ze zbiornika dla danego okresu
+			HashMap<Long, Double> tankDeltas = tankVolumesTotals.get(tankPeriods.get(i));
+			
+			for(Long tank : tankDeltas.keySet()) {
+				Double delta = tankDeltas.get(tank);
+				Double nozzSum = new Double(0);
+				for(Long nozz : nozzleSums.keySet()) {
+					if(tankMapping.get(nozz).equals(tank)) {
+						nozzSum = nozzSum + nozzleSums.get(nozz);
+					}
 				}
-				} else {
-					System.out.println("Error in checking nozzle.. Abort..");
+				Double sub = delta - nozzSum;
+				if (sub > 5.0 ) {
+//					 System.out.println( "Error detected at " + tankPeriods.get(i) + " on tank #" + tank + ". Delta= " + sub);
+					if (!nozzlesAnomalies.containsKey(tank)) {
+						HashMap<Times, Double> anomalies = new HashMap<Times, Double>();
+						nozzlesAnomalies.put(tank, anomalies);
+					}
+					HashMap<Times, Double> anomalies = nozzlesAnomalies.get(tank);
+					anomalies.put(tankPeriods.get(i), sub);
+					nozzlesAnomalies.put(tank, anomalies);
 				}
+				
 				
 			}
 			
+//			for (Long nozz : nozzleSums.keySet()) {
+//				Double delta = tankDeltas.get(tankMapping.get(nozz));
+//				Double sub = delta - nozzleSums.get(nozz);
+//				if (sub > 5.0 ) {
+//					// System.out.println(
+//					// "Error detected at " + tankPeriods.get(i) + " on nozzle #" + nozz + ". Delta
+//					// = " + sub);
+//					if (!nozzlesAnomalies.containsKey(nozz)) {
+//						HashMap<Times, Double> anomalies = new HashMap<Times, Double>();
+//						nozzlesAnomalies.put(nozz, anomalies);
+//					}
+//					HashMap<Times, Double> anomalies = nozzlesAnomalies.get(nozz);
+//					anomalies.put(tankPeriods.get(i), sub);
+//					nozzlesAnomalies.put(nozz, anomalies);
+//				}
+//			}
+			refueledTank = 0L;
 		}
-		
-	}
 
-//	public double getAvgVariancePerHour(Double variance) {
-//
-//		double result = 0;
-//		HashMap<Long, Times> list = tanks.splitDates(Period.HOUR);
-//		Integer hoursCount = list.size();
-//		result = variance / hoursCount;
-//
-//		return result;
-//	}
+		return nozzlesAnomalies;
+	}
 
 }

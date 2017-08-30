@@ -87,12 +87,12 @@ public abstract class DataExtractor {
 
 				}
 			}
-			
+
 			ArrayList<Times> exactRes = new ArrayList<Times>();
-			for(Long key : result.keySet()) {
+			for (Long key : result.keySet()) {
 				exactRes.add(result.get(key));
 			}
-			
+
 			return exactRes;
 		}
 		case HOUR: {
@@ -131,10 +131,10 @@ public abstract class DataExtractor {
 				}
 			}
 			ArrayList<Times> exactRes = new ArrayList<Times>();
-			for(Long key : result.keySet()) {
+			for (Long key : result.keySet()) {
 				exactRes.add(result.get(key));
 			}
-			
+
 			return exactRes;
 		}
 
@@ -162,27 +162,48 @@ public abstract class DataExtractor {
 			}
 		});
 
-		Date firstDateOfPeriod = dateList.get(0);
-		Date lastDateOfPeriod = null;
+		// Date firstDateOfPeriod = dateList.get(0);
+		// Date lastDateOfPeriod = null;
+		//
+		// Long checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
 
-		Long checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
-
-		for (int i = 1; i < dateList.size(); i++) {
-			if (dateList.get(i).getTime() >= checkDate) {
-
-				lastDateOfPeriod = dateList.get(i);
-				Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
-				result.add(time);
-
-				firstDateOfPeriod = dateList.get(i);
-				lastDateOfPeriod = null;
-				checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
-
-			}
-		}
-
-		if (lastDateOfPeriod == null) {
-			lastDateOfPeriod = dateList.get(dateList.size() - 1);
+		// for (int i = 0; i < dateList.size(); i++) {
+		// Date firstDateOfPeriod = dateList.get(i);
+		// Date lastDateOfPeriod = null;
+		// Long checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
+		//
+		// if (dateList.get(i).getTime() >= checkDate) {
+		//
+		// lastDateOfPeriod = dateList.get(i);
+		// Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
+		// result.add(time);
+		//
+		// firstDateOfPeriod = dateList.get(i);
+		// lastDateOfPeriod = null;
+		// checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
+		//
+		// }
+		// }
+		//
+		// if (lastDateOfPeriod == null) {
+		// lastDateOfPeriod = dateList.get(dateList.size() - 1);
+		// Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
+		// result.add(time);
+		// }
+		int i = 0;
+		while (i < dateList.size()) {
+			Date firstDateOfPeriod = dateList.get(i);
+			Date lastDateOfPeriod = null;
+			Long checkDate = firstDateOfPeriod.getTime() + customPeriodInMilis;
+			do {
+				if (dateList.get(i).getTime() >= checkDate) {
+					lastDateOfPeriod = dateList.get(i);
+				}
+				i++;
+				if (i == dateList.size()) {
+					lastDateOfPeriod = dateList.get(dateList.size() - 1);
+				}
+			} while (lastDateOfPeriod == null);
 			Times time = new Times(firstDateOfPeriod, lastDateOfPeriod);
 			result.add(time);
 		}
@@ -194,19 +215,19 @@ public abstract class DataExtractor {
 		return this.splitDates(period).size();
 	}
 
-	public ArrayList<Entity> sortEntityListByDate(ArrayList<Entity> entityList){
-	Collections.sort(entityList, new Comparator<Entity>() {
-		@Override
-		public int compare(Entity o1, Entity o2) {
-			// TODO Auto-generated method stub
-			Long obj1 = o1.getDate().getTime();
-			Long obj2 = o2.getDate().getTime();
-			return obj1.compareTo(obj2);
-		}
-	});
-	return entityList;
+	public ArrayList<Entity> sortEntityListByDate(ArrayList<Entity> entityList) {
+		Collections.sort(entityList, new Comparator<Entity>() {
+			@Override
+			public int compare(Entity o1, Entity o2) {
+				// TODO Auto-generated method stub
+				Long obj1 = o1.getDate().getTime();
+				Long obj2 = o2.getDate().getTime();
+				return obj1.compareTo(obj2);
+			}
+		});
+		return entityList;
 	}
-	
+
 	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times);
 
 }
