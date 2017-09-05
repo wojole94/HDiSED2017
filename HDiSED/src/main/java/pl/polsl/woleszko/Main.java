@@ -1,5 +1,7 @@
 package pl.polsl.woleszko;
 
+import java.util.Date;
+
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
@@ -12,10 +14,12 @@ public class Main {
 
 	    //Logback configuration - package level grained
         ((Logger) LoggerFactory.getLogger("pl.woleszko")).setLevel(Level.DEBUG);
-        ((Logger) LoggerFactory.getLogger("org.apache.camel")).setLevel(Level.INFO);
-		
-		DataAnalizer extractor = new DataAnalizer();
-		extractor.detect();
+        ((Logger) LoggerFactory.getLogger("pl.woleszko.polsl.model.utils")).setLevel(Level.INFO);
+//	    FileAccessor<TankMeasuresEntity> tankData;
+//        tankData = new FileAccessorCSV<>(TankMeasuresEntity.class, "D:/Zestaw 1/tankMeasures.csv");
+//        
+//		TankDataExtractor extractor = new TankDataExtractor(tankData);
+//		extractor.getVolumeChanges();
 //		
 //		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
 //		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
@@ -48,12 +52,12 @@ public class Main {
 ////		
 ////		System.out.println("counter: " + counter);
 		
-//		DataAnalizer analise = new DataAnalizer();
+		DataAnalizer analise = new DataAnalizer();
 //		analise.checkTank();
-//				analise.detect();
+				analise.detect();
 //		analise.splitDates(Period.DAY);
 //		analise.splitDates((long) 86400000);
-//		analise.checkTank((long) 3);
+//		analise.checkTank();
 
 	}
 

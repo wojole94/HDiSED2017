@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
@@ -14,7 +15,7 @@ import pl.woleszko.polsl.model.entities.Entity;
 import pl.woleszko.polsl.model.impl.FileAccessor;
 
 public abstract class DataExtractor<T extends Entity> {
-    private List<T> list;
+    protected List<T> list;
     
     /** Konstruktor, który pozwala skojarzć typ obiektu z plikiem zawierającym dane dla tego obiektu 
      * @param extractTo generyczny typ bazujący na klasie Entity, którego obiekty będą
@@ -220,6 +221,6 @@ public abstract class DataExtractor<T extends Entity> {
 	return entityList;
 	}
 	
-	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times);
+	public abstract Map<Integer, Double> getVolumeTotals();
 
 }

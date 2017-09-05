@@ -5,11 +5,11 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
 import org.apache.camel.main.Main;
 
 import lombok.extern.slf4j.Slf4j;
 import pl.woleszko.polsl.model.entities.Entity;
+import pl.woleszko.polsl.model.utils.BindyCsvDataFormat;
 
 @Slf4j
 public class FileAccessorZIP<T extends Entity> implements FileAccessor<T> {

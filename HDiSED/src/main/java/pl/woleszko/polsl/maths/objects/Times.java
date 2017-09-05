@@ -14,10 +14,10 @@ public class Times {
 		this.to = to;
 	}
 
-	public Boolean dateInPeriod(Date date) {
+	public Boolean containsDate(Date date) {
 		if (date.getTime() <= this.to.getTime() && date.getTime() >= this.from.getTime())
 			return true;
-		return true;
+		return false;
 	}
 
 	public Long getDuration() {
