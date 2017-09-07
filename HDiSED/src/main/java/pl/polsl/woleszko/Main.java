@@ -56,7 +56,7 @@ public class Main {
 //		analise.detect();
 //		analise.checkTank();
 		analise.checkPipes();
-//		analise.checkNozzles();
+		analise.checkNozzles();
 
 //		analise.splitDates(Period.DAY);
 //		analise.splitDates((long) 86400000);

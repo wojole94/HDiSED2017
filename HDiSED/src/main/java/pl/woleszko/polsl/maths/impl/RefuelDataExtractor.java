@@ -12,9 +12,11 @@ import pl.woleszko.polsl.model.entities.RefuelEntity;
 import pl.woleszko.polsl.model.impl.FileAccessor;
 
 public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
+	private HashMap<Times, Integer> refuelPeriods = new HashMap<Times, Integer>();
 
     public RefuelDataExtractor(FileAccessor<RefuelEntity> accessor) {
         super(accessor);
+        loadRefuelPeriods();
 	}
 
 	@Override
@@ -34,9 +36,7 @@ public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 
 	}
 	
-	public HashMap<Times, Integer> getRefuelPeriods(){
-		
-		HashMap<Times, Integer> result = new HashMap<Times, Integer>();
+	private void loadRefuelPeriods(){
 
 		for(RefuelEntity entity : list) {
 			Date startDate = new Date();
@@ -50,8 +50,21 @@ public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 			endDate.setTime(startDate.getTime() + duration);
 			
 			Times period = new Times(startDate, endDate);
-			result.put(period, entity.getTankId());
+			refuelPeriods.put(period, entity.getTankId());
 		}
-		return result;
+
+	}
+	
+	public Boolean dateInRefuelPeriod(Date date, Integer tankID) {
+		//Map<Times, Integer> refuelsPeriods = refuels.getRefuelPeriods();
+		List<Times> periods = refuelPeriods.entrySet().stream().filter(e1 -> e1.getValue().equals(tankID))
+				.map(Map.Entry::getKey).collect(Collectors.toList());
+
+		for (Times period : periods) {
+			if (period.containsDate(date)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

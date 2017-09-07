@@ -18,7 +18,9 @@ import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
 import pl.woleszko.polsl.model.impl.FileAccessor;
 
 public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
-	
+	private HashMap<Integer, Integer> assigns = new HashMap<>();
+	Map<Integer, List<Times>> tankUsagePeriods = new HashMap<>();
+	List<Date> multipleUsagePeriods = new ArrayList<>();
 
 	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
 		Map<Object, Boolean> map = new ConcurrentHashMap<>();
@@ -27,7 +29,9 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 
 	public NozzleDataExtractor(FileAccessor<NozzleMeasuresEntity> accessor) {
 		super(accessor);
-		
+		loadNozzlesAssign();
+		loadTankUsagePeriods();
+		loadMultipleUsagePeriods();
 	}
 
 	@Override
@@ -46,12 +50,12 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 		Map<Integer, Double> tankSums = new HashMap<>();
 
 		for (Integer nozz : nozzTotals.keySet()) {
-			if (!tankSums.containsKey(getNozzlesAssign().get(nozz))) {
-				tankSums.put(getNozzlesAssign().get(nozz), 0D);
+			if (!tankSums.containsKey(getNozzleAssign(nozz))) {
+				tankSums.put(getNozzleAssign(nozz), 0D);
 			}
-			sum = tankSums.get(getNozzlesAssign().get(nozz));
+			sum = tankSums.get(getNozzleAssign(nozz));
 			sum += nozzTotals.get(nozz);
-			tankSums.put(getNozzlesAssign().get(nozz), sum);
+			tankSums.put(getNozzleAssign(nozz), sum);
 		}
 
 		return tankSums;
@@ -131,9 +135,9 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 		return dateValues;
 	}
 
-	public List<Date> getMultipleUsagePeriods() {
+	private void loadMultipleUsagePeriods() {
 
-		List<Date> usageDates = new ArrayList<>();
+		//List<Date> usageDates = new ArrayList<>();
 		List<NozzleMeasuresEntity> usageMoments = list.stream().filter(e1 -> e1.getStatus().equals(0)).sorted()
 				.collect(Collectors.toList());
 		Date currDate = new Date();
@@ -141,9 +145,8 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 			if (!currDate.equals(usageMoment.getDate()))
 				currDate = usageMoment.getDate();
 			else
-				usageDates.add(usageMoment.getDate());
+				multipleUsagePeriods.add(usageMoment.getDate());
 		}
-		return usageDates;
 	}
 	
 	public Map<Integer, HashMap<Date, Double>> getVolumeChanges(){
@@ -167,26 +170,35 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 				entity = nextEntity;
 			}
 			
-			if (volumeChanges.containsKey(this.getNozzlesAssign().get(nozzleID))) {
-				HashMap<Date, Double> timesList = volumeChanges.get(this.getNozzlesAssign().get(nozzleID));
+			if (volumeChanges.containsKey(this.getNozzleAssign(nozzleID))) {
+				HashMap<Date, Double> timesList = volumeChanges.get(this.getNozzleAssign(nozzleID));
 				timesList.putAll(values);
-				volumeChanges.put(this.getNozzlesAssign().get(nozzleID), timesList);
+				volumeChanges.put(this.getNozzleAssign(nozzleID), timesList);
 			} else {
-				volumeChanges.put(this.getNozzlesAssign().get(nozzleID), values);
+				volumeChanges.put(this.getNozzleAssign(nozzleID), values);
 			}
 		}		
 		
 		return volumeChanges;
 	}
 	
+	public Boolean dateInMultipleUsagePeriod(Times period) {
+		//List<Date> multipleUsages = nozzles.getMultipleUsagePeriods();
+		for (Date multipleUsage : multipleUsagePeriods)
+			if (period.containsDate(multipleUsage))
+				return false;
+
+		return true;
+	}
+	
 	
 
-	public Map<Integer, List<Times>> getTankUsagePeriods() {
+	private void loadTankUsagePeriods() {
 
 		Map<Integer, List<NozzleMeasuresEntity>> splitedByNozzID = list.stream()
 				.collect(Collectors.groupingBy(entity -> entity.getNozId()));
 
-		Map<Integer, List<Times>> dateValuesPerTank = new HashMap<>();
+		//Map<Integer, List<Times>> dateValuesPerTank = new HashMap<>();
 		for (Integer nozzleID : splitedByNozzID.keySet()) {
 			List<NozzleMeasuresEntity> nozzleList = splitedByNozzID.get(nozzleID);
 			nozzleList = nozzleList.stream().sorted().collect(Collectors.toList());
@@ -209,34 +221,43 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 				}
 
 			}
-			if (dateValuesPerTank.containsKey(this.getNozzlesAssign().get(nozzleID))) {
-				List<Times> timesList = dateValuesPerTank.get(this.getNozzlesAssign().get(nozzleID));
+			if (tankUsagePeriods.containsKey(this.getNozzleAssign(nozzleID))) {
+				List<Times> timesList = tankUsagePeriods.get(this.getNozzleAssign(nozzleID));
 				timesList.addAll(values);
-				dateValuesPerTank.put(this.getNozzlesAssign().get(nozzleID), timesList);
+				tankUsagePeriods.put(this.getNozzleAssign(nozzleID), timesList);
 			} else {
-				dateValuesPerTank.put(this.getNozzlesAssign().get(nozzleID), values);
+				tankUsagePeriods.put(this.getNozzleAssign(nozzleID), values);
 			}
 
 		}
 
-		return dateValuesPerTank;
+	}
+	
+	public Integer getNozzleAssign(Integer nozzleID) {
+		return assigns.get(nozzleID);
+	}
+	
+	public Boolean dateInUsagePeriod(Date changeDate, Integer tankID) {
 
+		for (Times usagePeriod : tankUsagePeriods.get(tankID)) {
+			if (changeDate.after(usagePeriod.getFrom())
+					&& (changeDate.getTime() <= usagePeriod.getTo().getTime() + 300000)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
-	 * Returns the list which specify which nozzle correspond to which tank HashMap
+	 * Loads the list which specify which nozzle correspond to which tank HashMap
 	 * elems: 1. Long - nozzle 2. Long - tank
 	 */
-	public HashMap<Integer, Integer> getNozzlesAssign() {
-
-		HashMap<Integer, Integer> assigns = new HashMap<>();
-
+	private void loadNozzlesAssign() {
 		for (NozzleMeasuresEntity entity : getEntities()) {
 			if (!assigns.containsKey(entity.getNozId())) {
 				assigns.put(entity.getNozId(), entity.getTankId());
 			}
 		}
-		return assigns;
 	}
 
 }

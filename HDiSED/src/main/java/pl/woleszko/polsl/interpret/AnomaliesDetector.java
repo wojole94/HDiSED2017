@@ -68,28 +68,34 @@ public class AnomaliesDetector {
 	 * 4. There is delta on tank measures
 	 */
 
-	public Map<Date, Double> checkTank(Integer tankID) {
-//		System.out.println("*************************************");
-//		System.out.println("Checking tank leakages...");
-//		System.out.println("*************************************");
-		Map<Integer, Map<Date, Double>> leakages = new HashMap<>();
+	public Map<Date, Double> checkSingleTank(Integer tankID) {
 		Map<Integer, HashMap<Date, Double>> volumeChanges = tanks.getVolumeChanges();
-
-//		for (Integer tankID : tanks.getTanksIndexes()) {
 			System.out.println("Checking tank #" + tankID + "...");
 			Map<Date, Double> forTank = new HashMap<>();
 
 			for (Date changeDate : volumeChanges.get(tankID).keySet()) {
-				if (!dateInRefuelPeriod(changeDate, tankID) && !dateInUsagePeriod(changeDate, tankID)) {
+				if (!refuels.dateInRefuelPeriod(changeDate, tankID) && !nozzles.dateInUsagePeriod(changeDate, tankID)) {
 					System.out.println("Anomaly detection at " + changeDate + " on tank #" + tankID);
 					forTank.put(changeDate, volumeChanges.get(tankID).get(changeDate));
 				}
-
 			}
-//			leakages.put(tankID, forTank);
-//		}
+
 		return forTank;
 	}
+
+	public Map<Integer, Map<Date, Double>> checkTanks() {
+		System.out.println("*************************************");
+		System.out.println("Checking tank leakages...");
+		System.out.println("*************************************");
+		Map<Integer, Map<Date, Double>> leakages = new HashMap<>();
+
+		for (Integer tankID : tanks.getTanksIndexes()) {
+			Map<Date, Double> forTank = checkSingleTank(tankID);
+			leakages.put(tankID, forTank);
+		}
+		return leakages;
+	}
+	
 
 	/**
 	 * Returns List of anomalies when 
@@ -112,15 +118,13 @@ public class AnomaliesDetector {
 			HashMap<Date, Double> volumeChangesOnSystem = totalCounterVolumeChanges.get(tankID);
 			HashMap<Date, Double> volumeChangesOnTank = tankVolumeChanges.get(tankID);
 			for (Date changeDate : volumeChangesOnSystem.keySet()) {
-				if (!dateInUsagePeriod(changeDate, tankID) && !dateInRefuelPeriod(changeDate, tankID)) {
+				if (!nozzles.dateInUsagePeriod(changeDate, tankID) && !refuels.dateInRefuelPeriod(changeDate, tankID)) {
 					Date tankMeasureDate = tanks.getNextTankMeasureAfter(changeDate, tankID);
 					if (volumeChangesOnSystem.get(changeDate).equals(volumeChangesOnTank.get(tankMeasureDate))) {
 						System.out.println("Leakage on pipes system detected at " + changeDate
 								+ ". System related to tank #" + tankID);
 						forTank.put(changeDate, volumeChangesOnSystem.get(changeDate));
 					}
-//						System.out.println("Some strange things happens here (data is invalid! at " + changeDate
-//								+ " on tank #" + tankID + ")");
 				}
 			}
 			anomalies.put(tankID, forTank);
@@ -131,7 +135,7 @@ public class AnomaliesDetector {
 		System.out.println("*************************************");
 		for(Integer tankID : anomalies.keySet()) {
 			if(anomalies.get(tankID).isEmpty()) {
-				anomalies.put(tankID, checkTank(tankID));
+				anomalies.put(tankID, checkSingleTank(tankID));
 			}
 		}
 		
@@ -154,20 +158,20 @@ public class AnomaliesDetector {
 		Map<Integer, HashMap<Date, Double>> tankEntities = tanks.getVolumeChanges();
 		Map<Integer, Map<Times, Double>> anomalies = new HashMap<>();
 
-		for (Integer nozzID : nozzles.getNozzlesAssign().keySet()) {
-			System.out.println("Checking nozzle #"+nozzID+"... (tank #"+ nozzles.getNozzlesAssign().get(nozzID)+")");
+		for (Integer nozzID : nozzleUsages.keySet()) {
+			System.out.println("Checking nozzle #"+nozzID+"... (tank #"+ nozzles.getNozzleAssign(nozzID)+")");
 			Map<Times, Double> tankMeasuresFromNozzles = nozzleUsages.get(nozzID);
-			HashMap<Date, Double> tankMeasuresFromTanks = tankEntities.get(nozzles.getNozzlesAssign().get(nozzID));
+			HashMap<Date, Double> tankMeasuresFromTanks = tankEntities.get(nozzles.getNozzleAssign(nozzID));
 			HashMap<Times, Double> forNozzle = new HashMap<>();
 
 			tankMeasuresFromNozzles = tankMeasuresFromNozzles.entrySet().stream()
-					.filter(e1 -> dateInMultipleUsagePeriod(e1.getKey()))
+					.filter(e1 -> nozzles.dateInMultipleUsagePeriod(e1.getKey()))
 					.collect(Collectors.toMap(e1 -> e1.getKey(), e1 -> e1.getValue()));
 			Double val2 = 0D;
 			for (Times usageDate : tankMeasuresFromNozzles.keySet()) {
 				for (Date changeDate : tankMeasuresFromTanks.keySet()) {
-					if (!dateInRefuelPeriod(usageDate.getTo(), nozzles.getNozzlesAssign().get(nozzID))
-							&& dateInUsagePeriod(changeDate, nozzles.getNozzlesAssign().get(nozzID))) {
+					if (!refuels.dateInRefuelPeriod(usageDate.getTo(), nozzles.getNozzleAssign(nozzID))
+							&& nozzles.dateInUsagePeriod(changeDate, nozzles.getNozzleAssign(nozzID))) {
 						val2 = val2 + tankMeasuresFromTanks.get(changeDate);
 					}
 					Double val1 = tankMeasuresFromNozzles.get(usageDate);
@@ -184,39 +188,6 @@ public class AnomaliesDetector {
 		return anomalies;
 	}
 
-	public Boolean dateInRefuelPeriod(Date date, Integer tankID) {
-		Map<Times, Integer> refuelsPeriods = refuels.getRefuelPeriods();
-		List<Times> periods = refuelsPeriods.entrySet().stream().filter(e1 -> e1.getValue().equals(tankID))
-				.map(Map.Entry::getKey).collect(Collectors.toList());
 
-		for (Times period : periods) {
-			if (period.containsDate(date)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Boolean dateInUsagePeriod(Date changeDate, Integer tankID) {
-		Map<Integer, List<Times>> usagePeriods = nozzles.getTankUsagePeriods();
-		for (Times usagePeriod : usagePeriods.get(tankID)) {
-			if (changeDate.after(usagePeriod.getFrom())
-					&& (changeDate.getTime() <= usagePeriod.getTo().getTime() + 300000)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Boolean dateInMultipleUsagePeriod(Times period) {
-		List<Date> multipleUsages = nozzles.getMultipleUsagePeriods();
-		for (Date multipleUsage : multipleUsages)
-			if (period.containsDate(multipleUsage))
-				return false;
-
-		return true;
-	}
-	
-	
 
 }
