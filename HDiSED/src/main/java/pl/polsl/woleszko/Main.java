@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import pl.woleszko.polsl.interpret.DataAnalizer;
+import pl.woleszko.polsl.interpret.AnomaliesDetector;
 
 public class Main {
 
@@ -52,12 +52,15 @@ public class Main {
 ////		
 ////		System.out.println("counter: " + counter);
 		
-		DataAnalizer analise = new DataAnalizer();
+		AnomaliesDetector analise = new AnomaliesDetector();
+//		analise.detect();
 //		analise.checkTank();
-				analise.detect();
+		analise.checkPipes();
+//		analise.checkNozzles();
+
 //		analise.splitDates(Period.DAY);
 //		analise.splitDates((long) 86400000);
-//		analise.checkTank();
+		
 
 	}
 

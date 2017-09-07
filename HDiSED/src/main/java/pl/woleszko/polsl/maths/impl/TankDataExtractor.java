@@ -75,174 +75,27 @@ public class TankDataExtractor extends DataExtractor<TankMeasuresEntity> {
 		}
 		return dateValues;
 	}
-
-	// Srednie dzienne,godzinowe itp
-	public HashMap<Long, Double> getAverageDeltasOf(Period period) {
-
-		HashMap<Long, Double> avg = new HashMap<Long, Double>();
-		// for (Long tank : this.getTanksIndexes()) {
-		// avg.put(tank, 0.0);
-		// }
-		// ArrayList<Times> times = this.splitDates(period);
-		// HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
-		//
-		// for (Times timePeriod : totals.keySet()) {
-		// HashMap<Long, Double> tanksTotals = totals.get(timePeriod);
-		// for (Long tank : tanksTotals.keySet()) {
-		// Double value = avg.get(tank);
-		// value = tanksTotals.get(tank) + value;
-		// avg.put(tank, value);
-		// }
-		// }
-		//
-		// for (Long tank : avg.keySet()) {
-		//
-		// Double value = avg.get(tank);
-		// value = value / totals.size();
-		// avg.put(tank, value);
-		// }
-
-		return avg;
-	}
-
-	/**
-	 * Computes average amounts of fuel which is pumped out of each tank in each
-	 * hour of a day
-	 * 
-	 * @return
-	 */
-	public HashMap<Integer, HashMap<Long, Double>> getHoursTrend() {
-
-		// ArrayList<Times> times = this.splitDates(Period.HOUR);
-		// HashMap<Times, HashMap<Long, Double>> totals = this.getVolumeTotals(times);
-		HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<>();
-		//
-		// for (Times timePeriod : totals.keySet()) {
-		// if (!avg.containsKey(timePeriod.getFrom().getHours())) {
-		// System.out.println("New hour!");
-		//
-		// // Wyliczone srednie dla konkretnej godziny dla konkretnego tanka
-		// HashMap<Long, Double> hourTotals = new HashMap<Long, Double>();
-		//
-		// // Wyszukane wartosci zbiornika dla konkretnych dni dla kontetnego tanka
-		// HashMap<Long, ArrayList<Double>> tanksValues = new HashMap<Long,
-		// ArrayList<Double>>();
-		//
-		// for (Long index : this.getTanksIndexes()) {
-		// hourTotals.put(index, 0.0);
-		// tanksValues.put(index, new ArrayList<Double>());
-		// }
-		//
-		// // pobranie wrtosci dla tankow dla danego czasu (lista wartosci)
-		// for (Times currTimePeriod : totals.keySet()) {
-		// if (currTimePeriod.getFrom().getHours() == timePeriod.getFrom().getHours()) {
-		// for (Long tank : this.getTanksIndexes()) {
-		// ArrayList<Double> valuesList = tanksValues.get(tank);
-		// Double volume = totals.get(currTimePeriod).get(tank);
-		// valuesList.add(volume);
-		// tanksValues.put(tank, valuesList);
-		//
-		// }
-		//
-		// }
-		// }
-		//
-		// // wyszukanie minimum i maksimum, usuniecie warosci z isty wartosci
-		// for (Long tank : tanksValues.keySet()) {
-		// ArrayList<Double> currentTankValues = tanksValues.get(tank);
-		// Double max = currentTankValues.get(0);
-		// Double min = currentTankValues.get(0);
-		// int maxId = 0;
-		// int minId = 0;
-		// for (int i = 0; i < currentTankValues.size(); i++) {
-		// if (currentTankValues.get(i) > max) {
-		// max = currentTankValues.get(i);
-		// maxId = i;
-		// }
-		// if (currentTankValues.get(i) < min) {
-		// min = currentTankValues.get(i);
-		// minId = i;
-		// }
-		// }
-		//
-		// currentTankValues.set(maxId, 0.0);
-		// currentTankValues.set(minId, 0.0);
-		// Double sum = new Double(0);
-		//
-		// // Wyliczenie sum dla konkretnych godzin w tygodniu dla konkretnego zbiornika
-		// for (int i = 0; i < currentTankValues.size(); i++) {
-		// sum = sum + currentTankValues.get(i);
-		// }
-		//
-		// hourTotals.put(tank, sum);
-		// }
-		//
-		// avg.put(timePeriod.getFrom().getHours(), hourTotals);
-		// }
-		// }
-		//
-		// // Wyliczenie sredniej dla kazdego tanka
-		//
-		// for (Integer hour : avg.keySet()) {
-		// HashMap<Long, Double> hourTotals = avg.get(hour);
-		// for (Long tank : hourTotals.keySet()) {
-		// Double sum = hourTotals.get(tank);
-		// Integer dayCount = this.getPeriodsCount(Period.DAY);
-		// Double average = sum / dayCount;
-		// hourTotals.put(tank, average);
-		// }
-		// avg.put(hour, hourTotals);
-		// }
-
-		return avg;
-	}
-
+	
 	/**
 	 * 
-	 * @return medians of each tank in hours of the day
+	 * @param date - date after which you need tank measure date 
+	 * @param tankID - selected tank
+	 * @return Date of nearly tank measure. Returns null when there is not such one;
 	 */
-	// public HashMap<Integer, HashMap<Long, Double>> getTanksHourMedian() {
-	// ArrayList<Times> times = this.splitDates(Period.HOUR);
-	// // HashMap<Times, HashMap<Integer, Double>> totals =
-	// // this.getVolumeTotals(times);
-	// HashMap<Integer, HashMap<Long, Double>> avg = new HashMap<>();
-	// //
-	// // for (Times timePeriod : totals.keySet()) {
-	// // if (!avg.containsKey(timePeriod.getFrom().getHours())) {
-	// //
-	// // System.out.println("New hour!");
-	// // HashMap<Long, Double> hourMedians = new HashMap<Long, Double>();
-	// // HashMap<Long, DescriptiveStatistics> hourTotals = new HashMap<Long,
-	// // DescriptiveStatistics>();
-	// //
-	// // for(Long tank : this.getTanksIndexes()) {
-	// // DescriptiveStatistics statistics = new DescriptiveStatistics();
-	// // hourTotals.put(tank, statistics);
-	// // }
-	// //
-	// // //Totals loading
-	// // for (Times currTimePeriod : totals.keySet()) {
-	// // if (currTimePeriod.getFrom().getHours() ==
-	// timePeriod.getFrom().getHours()) {
-	// // for (Long tank : this.getTanksIndexes()) {
-	// // DescriptiveStatistics values = hourTotals.get(tank);
-	// // values.addValue(totals.get(currTimePeriod).get(tank));
-	// // hourTotals.put(tank, values);
-	// // }
-	// //
-	// // }
-	// // }
-	// // for(Long tank : hourTotals.keySet()) {
-	// // Double variance = hourTotals.get(tank).getPercentile(50);
-	// // hourMedians.put(tank, variance);
-	// // }
-	// //
-	// // avg.put(timePeriod.getFrom().getHours(), hourMedians);
-	// // }
-	// // }
-	// // return avg;
-	// }
-	//
+	
+	public Date getNextTankMeasureAfter(Date date, Integer tankID) {
+		List<TankMeasuresEntity> tankMeasuresForTank = list.stream().filter(e1 -> e1.getTankId().equals(tankID)).sorted().collect(Collectors.toList());
+		for(TankMeasuresEntity entity : tankMeasuresForTank) {
+			Date currentDate = entity.getDate();
+			if (currentDate.after(date)
+					&& (currentDate.getTime() <= date.getTime() + 300000)) {
+				return currentDate;
+			}
+		}
+		
+		return null;
+	}
+
 	public Integer getTanksCount() {
 		HashMap<Integer, Double> tanksVolume = new HashMap<>();
 		Integer count = new Integer(0);

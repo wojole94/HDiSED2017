@@ -22,6 +22,7 @@ public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 		
 		 Map<Integer, List<RefuelEntity>> splitedByTankID = list.stream().collect(Collectors.groupingBy(RefuelEntity::getTankId));
 			
+		 
 		 Map<Integer, Double> totals = splitedByTankID.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
 			 DoubleSummaryStatistics sum = entry.getValue().stream().collect(Collectors.summarizingDouble(entity -> entity.getFuelVol()));
 			 return sum.getSum();
