@@ -22,11 +22,6 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 	Map<Integer, List<Times>> tankUsagePeriods = new HashMap<>();
 	List<Date> multipleUsagePeriods = new ArrayList<>();
 
-	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-		Map<Object, Boolean> map = new ConcurrentHashMap<>();
-		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-	}
-
 	public NozzleDataExtractor(FileAccessor<NozzleMeasuresEntity> accessor) {
 		super(accessor);
 		loadNozzlesAssign();
@@ -118,6 +113,8 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 				if (entity.getStatus().equals(0)) {
 					tankEnd = false;
 					startEntity = entity;
+					// ********************************
+					// SPROBOWAC COS Z TYM WYKMINIC
 					while (!tankEnd && iter.hasNext()) {
 						NozzleMeasuresEntity nextEntity = iter.next();
 						if (nextEntity.getStatus().equals(1)) {
@@ -128,6 +125,7 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 							tankEnd = true;
 						}
 					}
+					// ********************************
 				}
 			}
 			dateValues.put(nozzleID, values);
@@ -137,7 +135,7 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 
 	private void loadMultipleUsagePeriods() {
 
-		//List<Date> usageDates = new ArrayList<>();
+		// List<Date> usageDates = new ArrayList<>();
 		List<NozzleMeasuresEntity> usageMoments = list.stream().filter(e1 -> e1.getStatus().equals(0)).sorted()
 				.collect(Collectors.toList());
 		Date currDate = new Date();
@@ -148,17 +146,18 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 				multipleUsagePeriods.add(usageMoment.getDate());
 		}
 	}
-	
-	public Map<Integer, HashMap<Date, Double>> getVolumeChanges(){
+
+	public Map<Integer, HashMap<Date, Double>> getVolumeChanges() {
 		Map<Integer, HashMap<Date, Double>> volumeChanges = new HashMap<>();
-		
-		Map<Integer, List<NozzleMeasuresEntity>> splitedByNozzle = list.stream().sorted().collect(Collectors.groupingBy(e1 -> e1.getNozId()));
-		
-		for(Integer nozzleID : splitedByNozzle.keySet()) {
+
+		Map<Integer, List<NozzleMeasuresEntity>> splitedByNozzle = list.stream().sorted()
+				.collect(Collectors.groupingBy(e1 -> e1.getNozId()));
+
+		for (Integer nozzleID : splitedByNozzle.keySet()) {
 			List<NozzleMeasuresEntity> nozzleEntities = splitedByNozzle.get(nozzleID);
 			ListIterator<NozzleMeasuresEntity> iter = nozzleEntities.listIterator();
 			HashMap<Date, Double> values = new HashMap<>();
-			
+
 			NozzleMeasuresEntity entity = iter.next();
 			while (iter.hasNext()) {
 				NozzleMeasuresEntity nextEntity = iter.next();
@@ -169,7 +168,7 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 				}
 				entity = nextEntity;
 			}
-			
+
 			if (volumeChanges.containsKey(this.getNozzleAssign(nozzleID))) {
 				HashMap<Date, Double> timesList = volumeChanges.get(this.getNozzleAssign(nozzleID));
 				timesList.putAll(values);
@@ -177,28 +176,26 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 			} else {
 				volumeChanges.put(this.getNozzleAssign(nozzleID), values);
 			}
-		}		
-		
+		}
+
 		return volumeChanges;
 	}
-	
+
 	public Boolean dateInMultipleUsagePeriod(Times period) {
-		//List<Date> multipleUsages = nozzles.getMultipleUsagePeriods();
+		// List<Date> multipleUsages = nozzles.getMultipleUsagePeriods();
 		for (Date multipleUsage : multipleUsagePeriods)
 			if (period.containsDate(multipleUsage))
 				return false;
-
+		
 		return true;
 	}
-	
-	
 
 	private void loadTankUsagePeriods() {
 
 		Map<Integer, List<NozzleMeasuresEntity>> splitedByNozzID = list.stream()
 				.collect(Collectors.groupingBy(entity -> entity.getNozId()));
 
-		//Map<Integer, List<Times>> dateValuesPerTank = new HashMap<>();
+		// Map<Integer, List<Times>> dateValuesPerTank = new HashMap<>();
 		for (Integer nozzleID : splitedByNozzID.keySet()) {
 			List<NozzleMeasuresEntity> nozzleList = splitedByNozzID.get(nozzleID);
 			nozzleList = nozzleList.stream().sorted().collect(Collectors.toList());
@@ -232,17 +229,18 @@ public class NozzleDataExtractor extends DataExtractor<NozzleMeasuresEntity> {
 		}
 
 	}
-	
+
 	public Integer getNozzleAssign(Integer nozzleID) {
 		return assigns.get(nozzleID);
 	}
-	
-	public Boolean dateInUsagePeriod(Date changeDate, Integer tankID) {
 
-		for (Times usagePeriod : tankUsagePeriods.get(tankID)) {
-			if (changeDate.after(usagePeriod.getFrom())
-					&& (changeDate.getTime() <= usagePeriod.getTo().getTime() + 300000)) {
-				return true;
+	public Boolean dateInUsagePeriod(Date changeDate, Integer tankID) {
+		if (tankUsagePeriods.get(tankID) != null) {
+			for (Times usagePeriod : tankUsagePeriods.get(tankID)) {
+				if (changeDate.after(usagePeriod.getFrom())
+						&& (changeDate.getTime() <= usagePeriod.getTo().getTime() + 300000)) {
+					return true;
+				}
 			}
 		}
 		return false;

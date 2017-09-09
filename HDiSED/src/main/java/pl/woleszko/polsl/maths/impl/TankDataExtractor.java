@@ -87,7 +87,7 @@ public class TankDataExtractor extends DataExtractor<TankMeasuresEntity> {
 		List<TankMeasuresEntity> tankMeasuresForTank = list.stream().filter(e1 -> e1.getTankId().equals(tankID)).sorted().collect(Collectors.toList());
 		for(TankMeasuresEntity entity : tankMeasuresForTank) {
 			Date currentDate = entity.getDate();
-			if (currentDate.after(date)
+			if (currentDate.getTime() >= date.getTime()
 					&& (currentDate.getTime() <= date.getTime() + 300000)) {
 				return currentDate;
 			}

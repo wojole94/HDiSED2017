@@ -59,12 +59,13 @@ public class RefuelDataExtractor extends DataExtractor<RefuelEntity> {
 		//Map<Times, Integer> refuelsPeriods = refuels.getRefuelPeriods();
 		List<Times> periods = refuelPeriods.entrySet().stream().filter(e1 -> e1.getValue().equals(tankID))
 				.map(Map.Entry::getKey).collect(Collectors.toList());
-
+	if(periods != null) {
 		for (Times period : periods) {
 			if (period.containsDate(date)) {
 				return true;
 			}
 		}
+	}
 		return false;
 	}
 }
