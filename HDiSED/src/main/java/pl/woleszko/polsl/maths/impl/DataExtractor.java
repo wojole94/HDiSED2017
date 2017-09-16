@@ -1,27 +1,41 @@
 package pl.woleszko.polsl.maths.impl;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import pl.woleszko.polsl.maths.objects.Period;
 import pl.woleszko.polsl.maths.objects.Times;
 import pl.woleszko.polsl.model.entities.Entity;
-import pl.woleszko.polsl.model.entities.RefuelEntity;
-import pl.woleszko.polsl.model.entities.TankMeasuresEntity;
-import pl.woleszko.polsl.model.impl.FileAccessorCSV;
+import pl.woleszko.polsl.model.impl.FileAccessor;
 
-public abstract class DataExtractor {
-	protected ArrayList<Entity> list;
+public abstract class DataExtractor<T extends Entity> {
+    protected List<T> list;
+    
+    /** Konstruktor, który pozwala skojarzć typ obiektu z plikiem zawierającym dane dla tego obiektu 
+     * @param extractTo generyczny typ bazujący na klasie Entity, którego obiekty będą
+     *        wyciągane z pliku
+     * @param fileFrom ścieżka do pliku zawierającego dane reprezentowane przez podany typ
+     * @throws FileNotFoundException 
+     */
+    public DataExtractor(FileAccessor<T> accessor) {
+        list = accessor.getValues();
 
-	protected ArrayList<Entity> getEntities(String fileName) {
-		// TODO Auto-generated method stub
-		FileAccessorCSV access = new FileAccessorCSV(fileName);
-		list = (ArrayList<Entity>) access.getValues();
+        // this.sortEntityListByDate((List<Entity>) list);     
+        // tak ^^^^ też się da, ale można prościej:
+        // Collections.sort() wymaga aby elementy listy 
+        // implementowały interface Comparable. W naszej klasie typ 
+        // generyczny T rozszerza klasę Entity, która spełnia ten warunek.
+        Collections.sort(list);
+    }  
+
+	protected List<T> getEntities() {
 		return list;
-
 	}
 
 	public ArrayList<Times> splitDates(Period swPeriod) {
@@ -207,6 +221,6 @@ public abstract class DataExtractor {
 	return entityList;
 	}
 	
-	public abstract HashMap<Times, HashMap<Long, Double>> getVolumeTotals(ArrayList<Times> times);
+	public abstract Map<Integer, Double> getVolumeTotals();
 
 }

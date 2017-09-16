@@ -1,29 +1,25 @@
 package pl.polsl.woleszko;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.Date;
 
-import pl.woleszko.polsl.interpret.DataAnalizer;
-import pl.woleszko.polsl.maths.impl.DataExtractor;
-//import pl.woleszko.polsl.interpret.LeakageDetector;
-import pl.woleszko.polsl.maths.impl.NozzleDataExtractor;
-import pl.woleszko.polsl.maths.impl.RefuelDataExtractor;
-import pl.woleszko.polsl.maths.impl.TankDataExtractor;
-import pl.woleszko.polsl.maths.objects.Period;
-import pl.woleszko.polsl.maths.objects.Times;
-import pl.woleszko.polsl.model.entities.Entity;
-import pl.woleszko.polsl.model.entities.NozzleMeasuresEntity;
-import pl.woleszko.polsl.model.impl.FileAccessorCSV;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import pl.woleszko.polsl.interpret.AnomaliesDetector;
 
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		DataAnalizer extractor = new DataAnalizer();
-		extractor.detect();
+
+	    //Logback configuration - package level grained
+        ((Logger) LoggerFactory.getLogger("pl.woleszko")).setLevel(Level.DEBUG);
+        ((Logger) LoggerFactory.getLogger("pl.woleszko.polsl.model.utils")).setLevel(Level.INFO);
+//	    FileAccessor<TankMeasuresEntity> tankData;
+//        tankData = new FileAccessorCSV<>(TankMeasuresEntity.class, "D:/Zestaw 1/tankMeasures.csv");
+//        
+//		TankDataExtractor extractor = new TankDataExtractor(tankData);
+//		extractor.getVolumeChanges();
 //		
 //		HashMap<Long, HashMap<Long, Times>> list = extractor.getUsagePeriods();
 //		HashMap<Long, Long> assignments = extractor.getNozzlesAssign();
@@ -56,12 +52,15 @@ public class Main {
 ////		
 ////		System.out.println("counter: " + counter);
 		
-//		DataAnalizer analise = new DataAnalizer();
+		AnomaliesDetector analise = new AnomaliesDetector();
+//		analise.detect();
 //		analise.checkTank();
-//				analise.detect();
+		analise.checkPipes();
+		analise.checkNozzles();
+
 //		analise.splitDates(Period.DAY);
 //		analise.splitDates((long) 86400000);
-//		analise.checkTank((long) 3);
+		
 
 	}
 
