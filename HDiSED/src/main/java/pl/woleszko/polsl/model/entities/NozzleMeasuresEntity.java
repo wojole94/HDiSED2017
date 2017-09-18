@@ -13,7 +13,6 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-
 public class NozzleMeasuresEntity extends Entity{
 
 	@DataField(pos = 1, pattern="yyyy-MM-dd HH:mm:ss")

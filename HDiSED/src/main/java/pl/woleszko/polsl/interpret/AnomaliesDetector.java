@@ -1,5 +1,6 @@
 package pl.woleszko.polsl.interpret;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,25 +26,26 @@ public class AnomaliesDetector {
 	NozzleDataExtractor nozzles;
 	RefuelDataExtractor refuels;
 	TankDataExtractor tanks;
-	String systemOutputFileName = "D:/Zestaw 1/systemOutput.log";
-	String nozzleOutputFileName = "D:/Zestaw 1/nozzleOutput.log";
+
 	PrintWriter systemOutputFile;
 	PrintWriter nozzleOutputFile;
 
-	public AnomaliesDetector() {
+	public AnomaliesDetector(String folderPath) {
 
 		FileAccessor<RefuelEntity> refuelData;
 		FileAccessor<TankMeasuresEntity> tankData;
 		FileAccessor<NozzleMeasuresEntity> nozzleData;
 
-		refuelData = new FileAccessorCSV<>(RefuelEntity.class, "D:/Zestaw 1/refuel.csv");
-		tankData = new FileAccessorCSV<>(TankMeasuresEntity.class, "D:/Zestaw 1/tankMeasures.csv");
-		nozzleData = new FileAccessorCSV<>(NozzleMeasuresEntity.class, "D:/Zestaw 1/nozzleMeasures.csv");
+		refuelData = new FileAccessorCSV<>(RefuelEntity.class, folderPath+"/refuel.csv");
+		tankData = new FileAccessorCSV<>(TankMeasuresEntity.class, folderPath+"/tankMeasures.csv");
+		nozzleData = new FileAccessorCSV<>(NozzleMeasuresEntity.class, folderPath+"/nozzleMeasures.csv");
 
 		refuels = new RefuelDataExtractor(refuelData);
 		nozzles = new NozzleDataExtractor(nozzleData);
 		tanks = new TankDataExtractor(tankData);
-
+		
+		String systemOutputFileName = folderPath+"/systemOutput.log";
+		String nozzleOutputFileName = folderPath+"/nozzleOutput.log";
 		try {
 			systemOutputFile = new PrintWriter(new FileWriter(systemOutputFileName));
 			nozzleOutputFile = new PrintWriter(new FileWriter(nozzleOutputFileName));

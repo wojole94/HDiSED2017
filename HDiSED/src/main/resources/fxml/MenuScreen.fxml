@@ -51,23 +51,26 @@
                         <RowConstraints valignment="TOP" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with tank measures data" wrappingWidth="195.26318359375" />
-                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse1" prefHeight="22.0" prefWidth="139.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="textFieldPath1" editable="false" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="1" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with nozzle measures data" GridPane.rowIndex="2" />
-                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse2" prefHeight="22.0" prefWidth="80.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with refuel data" GridPane.rowIndex="4" />
-                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse3" prefHeight="22.0" prefWidth="80.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <TextField fx:id="textFieldPath2" editable="false" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="3">
+                        <Text opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with tank measures data" wrappingWidth="195.26318359375" />
+                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse1" opacity="0.0" prefHeight="22.0" prefWidth="139.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="textFieldPath1" editable="false" opacity="0.0" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="1" />
+                        <Text opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with nozzle measures data" GridPane.rowIndex="2" />
+                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse2" opacity="0.0" prefHeight="22.0" prefWidth="80.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Text opacity="0.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose file with refuel data" GridPane.rowIndex="4" />
+                        <Button maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowse3" opacity="0.0" prefHeight="22.0" prefWidth="80.0" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField fx:id="textFieldPath2" editable="false" opacity="0.0" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="3">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                         </TextField>
-                        <TextField fx:id="textFieldPath3" editable="false" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="5" />
+                        <TextField fx:id="textFieldPath3" editable="false" opacity="0.0" prefHeight="22.0" prefWidth="339.0" promptText="No file selected" GridPane.rowIndex="5" />
                      </children>
                   </GridPane>
                   <Button fx:id="buttonStart" layoutX="432.0" layoutY="482.0" maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#start" prefHeight="22.0" prefWidth="80.0" text="Start" />
                   <Button fx:id="buttonDetails" layoutX="432.0" layoutY="482.0" maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#details" prefHeight="22.0" prefWidth="80.0" text="Show details" visible="false" />
+                  <Text layoutX="89.0" layoutY="256.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose directory with .csv files (nozzleMeasures.csv, refuel.csv, tankMeasures.csv)" wrappingWidth="464.26318359375" />
+                  <Button layoutX="531.0" layoutY="266.0" maxWidth="80.0" minWidth="80.0" mnemonicParsing="false" onAction="#buttonBrowseDirectory" prefHeight="22.0" prefWidth="139.0" text="Browse..." />
+                  <TextField fx:id="textFieldPathDirectory" editable="false" layoutX="89.0" layoutY="266.0" prefHeight="22.0" prefWidth="442.0" promptText="No directory selected" />
                </children>
             </AnchorPane>
          </children>
