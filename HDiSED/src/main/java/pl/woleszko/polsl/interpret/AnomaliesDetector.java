@@ -217,8 +217,7 @@ public class AnomaliesDetector {
 			Map<Times, Double> newMap = forNozzle.entrySet().stream().filter(StreamUtils.distinctByKey(e1 -> e1.getKey().getFrom())).collect(Collectors.toMap(e1 -> e1.getKey(), e1 -> e1.getValue()));
 			for(Times period : newMap.keySet()) {
 				if (newMap.get(period) != 0.0) {
-					nozzleOutputFile.println("Anomaly detected at " + period + " related to nozzle " + nozzID
-							+" . Delta = " + newMap.get(period));
+					nozzleOutputFile.println("Anomaly detected at " + period + " related to nozzle " + nozzID);
 				}
 			}
 			anomalies.put(nozzID, forNozzle);
